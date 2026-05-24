@@ -1,0 +1,25 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# IDEs and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Project specific storage
+storage/documents/*
+!storage/documents/.gitkeep
+
+# Ignore pytest cache and test outputs
+.pytest_cache/
+.ruff_cache/
+*.log
