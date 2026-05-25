@@ -2,7 +2,7 @@ from abc import abstractmethod
 from typing import Optional
 
 from src.models import Practica
-from src.repositories.interfaces.base import RepositoryABC
+from src.repositories.interfaces import RepositoryABC
 
 
 class PracticaRepositoryABC(RepositoryABC):
@@ -11,5 +11,5 @@ class PracticaRepositoryABC(RepositoryABC):
         pass
 
     @abstractmethod
-    def buscar_practica_activa_estudiante(self, id_p_estudiante: int) -> Optional[Practica]:
+    def buscar_por_estudiante(self, id_p_estudiante: int) -> Optional[Practica]:
         pass

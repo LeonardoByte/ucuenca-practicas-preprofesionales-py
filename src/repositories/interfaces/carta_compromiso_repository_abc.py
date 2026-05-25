@@ -2,7 +2,7 @@ from abc import abstractmethod
 from typing import Optional
 
 from src.models import CartaCompromiso
-from src.repositories.interfaces.base import RepositoryABC
+from src.repositories.interfaces import RepositoryABC
 
 
 class CartaCompromisoRepositoryABC(RepositoryABC):
