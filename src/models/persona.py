@@ -66,9 +66,7 @@ class Personal(Persona):
             direccion,
             rol="Personal",
         )
-        self.rol_personal = (
-            rol_personal  # "Coordinador", "Tutor Academico", "Tutor Empresarial"
-        )
+        self.rol_personal = rol_personal  # "Coordinador", "Tutor Academico", "Tutor Empresarial"
 
 
 class CoordinadorDePracticas(Personal):

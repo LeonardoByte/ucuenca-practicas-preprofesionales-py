@@ -5,18 +5,14 @@ from src.models import Postulacion
 
 class PostulacionServiceABC(ABC):
     @abstractmethod
-    def registrar_postulacion(
-        self, id_p_estudiante: int, id_o: str, id_e: int
-    ) -> bool:
+    def registrar_postulacion(self, id_p_estudiante: int, id_o: str, id_e: int) -> bool:
         """Valida elegibilidad y la inexistencia de prácticas activas
         antes de registrar la postulación.
         """
         pass
 
     @abstractmethod
-    def validar_postulacion(
-        self, id_pos: int, id_p_coordinador: int, es_valida: bool
-    ) -> bool:
+    def validar_postulacion(self, id_pos: int, id_p_coordinador: int, es_valida: bool) -> bool:
         """El coordinador aprueba o rechaza los requisitos académicos del postulante."""
         pass
 

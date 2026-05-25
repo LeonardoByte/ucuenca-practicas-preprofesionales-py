@@ -1,6 +1,7 @@
 from typing import Any, Optional
 
 import pytest
+
 from src.repositories.interfaces import (
     CartaCompromisoRepositoryABC,
     EstudianteRepositoryABC,

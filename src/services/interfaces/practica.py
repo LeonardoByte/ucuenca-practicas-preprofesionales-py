@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Optional
 
 from src.models import Actividad, Formulario, Practica
 
@@ -29,29 +30,28 @@ class PracticaServiceABC(ABC):
 
     @abstractmethod
     def aprobar_solicitud_autorizacion(
-        self, id_sol_aut: int, id_p_coordinador: int, aprobar: bool
+        self,
+        id_sol_aut: int,
+        id_p_coordinador: int,
+        aprobar: bool,
+        id_p_tutor_acad: Optional[int] = None,
+        id_p_tutor_emp: Optional[int] = None,
     ) -> bool:
         """Coordinador aprueba o rechaza la solicitud de empresa propia."""
         pass
 
     @abstractmethod
-    def emitir_oficio(
-        self, id_sol_of: int, id_p_coordinador: int, ruta_pdf: str
-    ) -> bool:
+    def emitir_oficio(self, id_sol_of: int, id_p_coordinador: int, ruta_pdf: str) -> bool:
         """Coordinador emite formalmente el oficio a la empresa."""
         pass
 
     @abstractmethod
-    def registrar_entrega_carta_compromiso(
-        self, id_pr: int, id_carta: int, ruta_pdf: str
-    ) -> bool:
+    def registrar_entrega_carta_compromiso(self, id_pr: int, id_carta: int, ruta_pdf: str) -> bool:
         """Registrar la entrega de las 3 copias físicas firmadas por el estudiante."""
         pass
 
     @abstractmethod
-    def registrar_firma_decano_carta_compromiso(
-        self, id_carta: int, firmado: bool
-    ) -> bool:
+    def registrar_firma_decano_carta_compromiso(self, id_carta: int, firmado: bool) -> bool:
         """Registrar la firma del Decana/o en las copias entregadas."""
         pass
 
@@ -74,9 +74,7 @@ class PracticaServiceABC(ABC):
         pass
 
     @abstractmethod
-    def ejecutar_cierre_oficial(
-        self, id_pr: int, id_p_coordinador: int
-    ) -> bool:
+    def ejecutar_cierre_oficial(self, id_pr: int, id_p_coordinador: int) -> bool:
         """Valida los formularios finales, aprueba el Formulario 1
         y da el cierre oficial a la práctica.
         """

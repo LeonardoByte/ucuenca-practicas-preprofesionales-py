@@ -31,4 +31,3 @@ class EstudianteServiceABC(ABC):
     ) -> SolicitudOficio:
         """Registrar solicitud de oficio/certificado dirigida a la empresa."""
         pass
-

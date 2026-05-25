@@ -16,9 +16,7 @@ class SolicitudAutorizacion:
         self.nombre_empresa = nombre_empresa
         self.detalles_empresa = detalles_empresa
         self.fecha_solicitud = fecha_solicitud
-        self.estado_solicitud = (
-            estado_solicitud  # "Pendiente", "Aprobada", "Rechazada"
-        )
+        self.estado_solicitud = estado_solicitud  # "Pendiente", "Aprobada", "Rechazada"
         self.id_p_coordinador: Optional[int] = None
 
 
@@ -39,9 +37,7 @@ class SolicitudOficio:
         self.cargo_destinatario = cargo_destinatario
         self.nombre_empresa = nombre_empresa
         self.fecha_solicitud = fecha_solicitud
-        self.estado_solicitud = (
-            estado_solicitud  # "Pendiente", "Emitida", "Rechazada"
-        )
+        self.estado_solicitud = estado_solicitud  # "Pendiente", "Emitida", "Rechazada"
         self.ruta_oficio_pdf: Optional[str] = None
         self.id_p_coordinador: Optional[int] = None
 

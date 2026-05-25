@@ -57,9 +57,7 @@ class Actividad:
         self.id_act = id_act  # PK compuesta junto con id_pr
         self.id_pr = id_pr
         self.descripcion_de_la_tarea = descripcion_de_la_tarea
-        self.estado_de_validacion = (
-            estado_de_validacion  # "Propuesta", "Validada", "Rechazada"
-        )
+        self.estado_de_validacion = estado_de_validacion  # "Propuesta", "Validada", "Rechazada"
 
 
 class Formulario:
@@ -74,11 +72,7 @@ class Formulario:
     ):
         self.id_doc = id_doc  # PK compuesta junto con id_pr
         self.id_pr = id_pr
-        self.tipo_formulario = (
-            tipo_formulario  # "Formulario 1", "Formulario 2", "Formulario 3"
-        )
-        self.estado_de_firma = (
-            estado_de_firma  # "Presentado", "Completado", "Aprobado"
-        )
+        self.tipo_formulario = tipo_formulario  # "Formulario 1", "Formulario 2", "Formulario 3"
+        self.estado_de_firma = estado_de_firma  # "Presentado", "Completado", "Aprobado"
         self.fecha_de_entrega_registro = fecha_de_entrega_registro
         self.numero_formulario = numero_formulario
