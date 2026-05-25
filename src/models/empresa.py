@@ -12,10 +12,10 @@ class Convenio:
     def __init__(
         self,
         id_con: int,
-        id_e: int,
+        id_e: int,  # (Clave Foránea -> Empresa)
         fecha_firma: str,
         fecha_vencimiento: str,
-        estado_del_convenio: str,
+        estado_del_convenio: str, # "Activo", "Caducado"
     ):
         self.id_con = id_con
         self.id_e = id_e
@@ -28,14 +28,14 @@ class Oferta:
     def __init__(
         self,
         id_o: str,
-        id_e: int,
+        id_e: int,  # (Clave Foránea -> Empresa)
         descripcion_oferta: str,
         requisitos: str,
         fecha_de_publicacion: str,
         duracion: str,
         remuneracion: float,
     ):
-        self.id_o = id_o  # PK compuesta junto con id_e
+        self.id_o = id_o
         self.id_e = id_e
         self.descripcion_oferta = descripcion_oferta
         self.requisitos = requisitos

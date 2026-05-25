@@ -27,10 +27,10 @@ class Estudiante(Persona):
         direccion: str,
         ciclo_actual: str,
         estado_de_matricula: str,
-        malla_academica: str,
-        curriculum_vitae: str,
+        malla_academica: str,  # Ruta local del archivo PDF
+        curriculum_vitae: str,  # Ruta local del archivo PDF
         historial_practicas: str,
-        estado_practica: str,
+        estado_practica: str,  # "Sin Practicas", "Activa", "Finalizada"
     ):
         super().__init__(
             id_p,
@@ -42,10 +42,10 @@ class Estudiante(Persona):
         )
         self.ciclo_actual = ciclo_actual
         self.estado_de_matricula = estado_de_matricula
-        self.malla_academica = malla_academica  # Ruta local del archivo PDF
-        self.curriculum_vitae = curriculum_vitae  # Ruta local del archivo PDF
+        self.malla_academica = malla_academica
+        self.curriculum_vitae = curriculum_vitae
         self.historial_practicas = historial_practicas
-        self.estado_practica = estado_practica  # "Sin Practicas", "Activa", "Finalizada"
+        self.estado_practica = estado_practica
 
 
 class Personal(Persona):
@@ -56,7 +56,7 @@ class Personal(Persona):
         cedula_dni: str,
         correo_electronico: str,
         direccion: str,
-        rol_personal: str,
+        rol_personal: str,  # "Coordinador", "Tutor Academico", "Tutor Empresarial"
     ):
         super().__init__(
             id_p,
@@ -66,8 +66,7 @@ class Personal(Persona):
             direccion,
             rol="Personal",
         )
-        self.rol_personal = rol_personal  # "Coordinador", "Tutor Academico", "Tutor Empresarial"
-
+        self.rol_personal = rol_personal
 
 class CoordinadorDePracticas(Personal):
     def __init__(
@@ -115,7 +114,7 @@ class TutorEmpresarial(Personal):
         cedula_dni: str,
         correo_electronico: str,
         direccion: str,
-        id_e: int,
+        id_e: int,  # (Clave Foránea -> Empresa)
     ):
         super().__init__(
             id_p,
@@ -125,4 +124,4 @@ class TutorEmpresarial(Personal):
             direccion,
             rol_personal="Tutor Empresarial",
         )
-        self.id_e = id_e  # FK hacia Empresa (N a 1)
+        self.id_e = id_e
