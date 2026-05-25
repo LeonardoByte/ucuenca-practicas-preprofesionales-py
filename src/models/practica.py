@@ -6,8 +6,8 @@ class Postulacion:
         self,
         id_pos: int,
         id_p_estudiante: int,  # (Clave Foránea -> Estudiante)
-        id_o: str,  # (Clave Foránea compuesta -> Oferta)
-        id_e: int,  # (Clave Foránea compuesta -> Oferta)
+        id_o: str,  # (Clave Foránea -> Oferta)
+        id_e: int,  # (Clave Foránea -> Empresa)
         id_p_coordinador: int,  # (Clave Foránea -> Coordinador)
         fecha_postulacion: str,
         estado_de_postulacion: str,  # "Pendiente", "Validada", "Aceptada", "Rechazada"
