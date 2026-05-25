@@ -1,9 +1,9 @@
-import pickle
 from pathlib import Path
 from typing import Optional
 
 from src.models import SolicitudOficio
-from src.repositories.interfaces.solicitud_oficio import SolicitudOficioRepositoryABC
+from src.repositories.interfaces.solicitud_oficio_repository_abc import SolicitudOficioRepositoryABC
+from src.utils.serialization import load_db_dat, save_db_dat
 
 
 class SolicitudOficioRepository(SolicitudOficioRepositoryABC):
@@ -13,15 +13,12 @@ class SolicitudOficioRepository(SolicitudOficioRepositoryABC):
 
     def _cargar_datos(self) -> None:
         if self.filepath.exists():
-            with open(self.filepath, "rb") as f:
-                self._datos = pickle.load(f)
+            self._datos = load_db_dat(self.filepath)
         else:
             self._datos = []
 
     def _guardar_datos(self) -> None:
-        self.filepath.parent.mkdir(parents=True, exist_ok=True)
-        with open(self.filepath, "wb") as f:
-            pickle.dump(self._datos, f)
+        save_db_dat(self.filepath, self._datos)
 
     def guardar(self, entidad: SolicitudOficio) -> bool:
         self._cargar_datos()
@@ -29,13 +26,14 @@ class SolicitudOficioRepository(SolicitudOficioRepositoryABC):
         if entidad.id_sol_of is None or entidad.id_sol_of <= 0:
             current_ids = [s.id_sol_of for s in self._datos]
             entidad.id_sol_of = max(current_ids) + 1 if current_ids else 1
-
-        for idx, s in enumerate(self._datos):
-            if s.id_sol_of == entidad.id_sol_of:
-                self._datos[idx] = entidad
-                break
-        else:
             self._datos.append(entidad)
+        else:
+            for idx, s in enumerate(self._datos):
+                if s.id_sol_of == entidad.id_sol_of:
+                    self._datos[idx] = entidad
+                    break
+            else:
+                return False
 
         self._guardar_datos()
         return True

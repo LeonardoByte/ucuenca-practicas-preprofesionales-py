@@ -1,9 +1,9 @@
-import pickle
 from pathlib import Path
 from typing import Optional
 
 from src.models import Practica
-from src.repositories.interfaces.practica import PracticaRepositoryABC
+from src.repositories.interfaces.practica_repository_abc import PracticaRepositoryABC
+from src.utils.serialization import load_db_dat, save_db_dat
 
 
 class PracticaRepository(PracticaRepositoryABC):
@@ -13,15 +13,12 @@ class PracticaRepository(PracticaRepositoryABC):
 
     def _cargar_datos(self) -> None:
         if self.filepath.exists():
-            with open(self.filepath, "rb") as f:
-                self._datos = pickle.load(f)
+            self._datos = load_db_dat(self.filepath)
         else:
             self._datos = []
 
     def _guardar_datos(self) -> None:
-        self.filepath.parent.mkdir(parents=True, exist_ok=True)
-        with open(self.filepath, "wb") as f:
-            pickle.dump(self._datos, f)
+        save_db_dat(self.filepath, self._datos)
 
     def guardar(self, entidad: Practica) -> bool:
         self._cargar_datos()
@@ -29,13 +26,14 @@ class PracticaRepository(PracticaRepositoryABC):
         if entidad.id_pr is None or entidad.id_pr <= 0:
             current_ids = [p.id_pr for p in self._datos]
             entidad.id_pr = max(current_ids) + 1 if current_ids else 1
-
-        for idx, p in enumerate(self._datos):
-            if p.id_pr == entidad.id_pr:
-                self._datos[idx] = entidad
-                break
-        else:
             self._datos.append(entidad)
+        else:
+            for idx, p in enumerate(self._datos):
+                if p.id_pr == entidad.id_pr:
+                    self._datos[idx] = entidad
+                    break
+            else:
+                return False
 
         self._guardar_datos()
         return True
@@ -61,8 +59,7 @@ class PracticaRepository(PracticaRepositoryABC):
         postulaciones_path = Path("storage/db/postulaciones.dat")
         if not postulaciones_path.exists():
             return None
-        with open(postulaciones_path, "rb") as f:
-            postulaciones = pickle.load(f)
+        postulaciones = load_db_dat(postulaciones_path)
 
         student_pos_ids = {p.id_pos for p in postulaciones if p.id_p_estudiante == id_p_estudiante}
         for pr in self._datos:
@@ -72,3 +69,6 @@ class PracticaRepository(PracticaRepositoryABC):
             ):
                 return pr
         return None
+
+    def buscar_por_estudiante(self, id_p_estudiante: int) -> Optional[Practica]:
+        return self.buscar_practica_activa_estudiante(id_p_estudiante)

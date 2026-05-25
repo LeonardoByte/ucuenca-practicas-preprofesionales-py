@@ -1,11 +1,9 @@
-import pickle
 from pathlib import Path
 from typing import Optional
 
 from src.models import CartaCompromiso
-from src.repositories.interfaces.carta_compromiso import (
-    CartaCompromisoRepositoryABC,
-)
+from src.repositories.interfaces.carta_compromiso_repository_abc import CartaCompromisoRepositoryABC
+from src.utils.serialization import load_db_dat, save_db_dat
 
 
 class CartaCompromisoRepository(CartaCompromisoRepositoryABC):
@@ -15,15 +13,12 @@ class CartaCompromisoRepository(CartaCompromisoRepositoryABC):
 
     def _cargar_datos(self) -> None:
         if self.filepath.exists():
-            with open(self.filepath, "rb") as f:
-                self._datos = pickle.load(f)
+            self._datos = load_db_dat(self.filepath)
         else:
             self._datos = []
 
     def _guardar_datos(self) -> None:
-        self.filepath.parent.mkdir(parents=True, exist_ok=True)
-        with open(self.filepath, "wb") as f:
-            pickle.dump(self._datos, f)
+        save_db_dat(self.filepath, self._datos)
 
     def guardar(self, entidad: CartaCompromiso) -> bool:
         self._cargar_datos()
@@ -31,13 +26,14 @@ class CartaCompromisoRepository(CartaCompromisoRepositoryABC):
         if entidad.id_carta is None or entidad.id_carta <= 0:
             current_ids = [c.id_carta for c in self._datos]
             entidad.id_carta = max(current_ids) + 1 if current_ids else 1
-
-        for idx, c in enumerate(self._datos):
-            if c.id_carta == entidad.id_carta:
-                self._datos[idx] = entidad
-                break
-        else:
             self._datos.append(entidad)
+        else:
+            for idx, c in enumerate(self._datos):
+                if c.id_carta == entidad.id_carta:
+                    self._datos[idx] = entidad
+                    break
+            else:
+                return False
 
         self._guardar_datos()
         return True

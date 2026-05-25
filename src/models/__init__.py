@@ -9,6 +9,7 @@ from src.models.persona import (
 )
 from src.models.practica import Actividad, Formulario, Postulacion, Practica
 from src.models.solicitud import CartaCompromiso, SolicitudAutorizacion, SolicitudOficio
+from src.models.usuario import Usuario
 
 __all__ = [
     "Persona",
@@ -27,4 +28,5 @@ __all__ = [
     "Practica",
     "Actividad",
     "Formulario",
+    "Usuario",
 ]

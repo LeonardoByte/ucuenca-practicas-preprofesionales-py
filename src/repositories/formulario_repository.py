@@ -1,9 +1,9 @@
-import pickle
 from pathlib import Path
 from typing import Any, Optional
 
 from src.models import Formulario
-from src.repositories.interfaces.formulario import FormularioRepositoryABC
+from src.repositories.interfaces.formulario_repository_abc import FormularioRepositoryABC
+from src.utils.serialization import load_db_dat, save_db_dat
 
 
 class FormularioRepository(FormularioRepositoryABC):
@@ -13,15 +13,12 @@ class FormularioRepository(FormularioRepositoryABC):
 
     def _cargar_datos(self) -> None:
         if self.filepath.exists():
-            with open(self.filepath, "rb") as f:
-                self._datos = pickle.load(f)
+            self._datos = load_db_dat(self.filepath)
         else:
             self._datos = []
 
     def _guardar_datos(self) -> None:
-        self.filepath.parent.mkdir(parents=True, exist_ok=True)
-        with open(self.filepath, "wb") as f:
-            pickle.dump(self._datos, f)
+        save_db_dat(self.filepath, self._datos)
 
     def guardar(self, entidad: Formulario) -> bool:
         self._cargar_datos()
@@ -29,13 +26,14 @@ class FormularioRepository(FormularioRepositoryABC):
         if entidad.id_doc is None or entidad.id_doc <= 0:
             current_ids = [f.id_doc for f in self._datos]
             entidad.id_doc = max(current_ids) + 1 if current_ids else 1
-
-        for idx, f in enumerate(self._datos):
-            if f.id_doc == entidad.id_doc and f.id_pr == entidad.id_pr:
-                self._datos[idx] = entidad
-                break
-        else:
             self._datos.append(entidad)
+        else:
+            for idx, f in enumerate(self._datos):
+                if f.id_doc == entidad.id_doc and f.id_pr == entidad.id_pr:
+                    self._datos[idx] = entidad
+                    break
+            else:
+                return False
 
         self._guardar_datos()
         return True
@@ -58,6 +56,13 @@ class FormularioRepository(FormularioRepositoryABC):
         self._cargar_datos()
         for f in self._datos:
             if f.id_doc == id_doc and f.id_pr == id_pr:
+                return f
+        return None
+
+    def buscar_por_id(self, id_doc: int) -> Optional[Formulario]:
+        self._cargar_datos()
+        for f in self._datos:
+            if f.id_doc == id_doc:
                 return f
         return None
 

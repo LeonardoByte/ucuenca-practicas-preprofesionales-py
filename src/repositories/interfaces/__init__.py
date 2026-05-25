@@ -14,6 +14,7 @@ from src.repositories.interfaces.solicitud_autorizacion_repository_abc import So
 from src.repositories.interfaces.solicitud_oficio_repository_abc import SolicitudOficioRepositoryABC
 from src.repositories.interfaces.tutor_academico_repository_abc import TutorAcademicoRepositoryABC
 from src.repositories.interfaces.tutor_empresarial_repository_abc import TutorEmpresarialRepositoryABC
+from src.repositories.interfaces.usuario_repository_abc import UsuarioRepositoryABC
 
 __all__ = [
     "RepositoryABC",
@@ -30,5 +31,6 @@ __all__ = [
     "SolicitudAutorizacionRepositoryABC",
     "SolicitudOficioRepositoryABC",
     "TutorAcademicoRepositoryABC",
-    "TutorEmpresarialRepositoryABC"
+    "TutorEmpresarialRepositoryABC",
+    "UsuarioRepositoryABC"
 ]
