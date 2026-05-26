@@ -23,13 +23,14 @@ class EstudianteRepository(EstudianteRepositoryABC):
         if entidad.id_p is None or entidad.id_p <= 0:
             current_ids = [p.id_p for p in self._datos]
             entidad.id_p = max(current_ids) + 1 if current_ids else 1
-
-        for idx, p in enumerate(self._datos):
-            if p.id_p == entidad.id_p:
-                self._datos[idx] = entidad
-                break
+            self._datos.append(entidad)
         else:
-            return False
+            for idx, p in enumerate(self._datos):
+                if p.id_p == entidad.id_p:
+                    self._datos[idx] = entidad
+                    break
+            else:
+                self._datos.append(entidad)
 
         self._guardar_datos()
         return True

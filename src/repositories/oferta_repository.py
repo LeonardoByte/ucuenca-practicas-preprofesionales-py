@@ -23,43 +23,23 @@ class OfertaRepository(OfertaRepositoryABC):
     def guardar(self, entidad: Oferta) -> bool:
         self._cargar_datos()
 
-        is_empty_or_zero = False
-        if not entidad.id_o:
-            is_empty_or_zero = True
-        else:
-            try:
-                if int(entidad.id_o) <= 0:
-                    is_empty_or_zero = True
-            except ValueError:
-                pass
-
-        if is_empty_or_zero:
-            numeric_ids = []
-            for o in self._datos:
-                if isinstance(o.id_o, int):
-                    numeric_ids.append(o.id_o)
-                elif isinstance(o.id_o, str) and o.id_o.startswith("O"):
-                    try:
-                        numeric_ids.append(int(o.id_o[1:]))
-                    except ValueError:
-                        pass
-            next_num = max(numeric_ids) + 1 if numeric_ids else 1
-            entidad.id_o = f"O{next_num}"
+        if entidad.id_o is None or entidad.id_o <= 0:
+            current_ids = [o.id_o for o in self._datos if isinstance(o.id_o, int)]
+            entidad.id_o = max(current_ids) + 1 if current_ids else 1
             self._datos.append(entidad)
         else:
             for idx, o in enumerate(self._datos):
-                if o.id_o == entidad.id_o and o.id_e == entidad.id_e:
+                if o.id_o == entidad.id_o:
                     self._datos[idx] = entidad
                     break
             else:
-                return False
+                self._datos.append(entidad)
 
         self._guardar_datos()
         return True
 
     def eliminar(self, id_entidad: Any) -> bool:
         self._cargar_datos()
-        # id_entidad could be a composite key tuple (id_o, id_e) or just string id_o
         original_len = len(self._datos)
         if isinstance(id_entidad, tuple) and len(id_entidad) == 2:
             id_o, id_e = id_entidad
@@ -72,18 +52,17 @@ class OfertaRepository(OfertaRepositoryABC):
             return True
         return False
 
-    def buscar_por_clave_compuesta(self, id_o: str, id_e: int) -> Optional[Oferta]:
+    def buscar_por_clave_compuesta(self, id_o: int, id_e: int) -> Optional[Oferta]:
         self._cargar_datos()
         for o in self._datos:
             if o.id_o == id_o and o.id_e == id_e:
                 return o
         return None
 
-    def buscar_por_id(self, id_o: Any) -> Optional[Oferta]:
+    def buscar_por_id(self, id_o: int) -> Optional[Oferta]:
         self._cargar_datos()
-        target = str(id_o)
         for o in self._datos:
-            if str(o.id_o) == target:
+            if o.id_o == id_o:
                 return o
         return None
 

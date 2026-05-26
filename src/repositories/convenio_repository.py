@@ -33,7 +33,7 @@ class ConvenioRepository(ConvenioRepositoryABC):
                     self._datos[idx] = entidad
                     break
             else:
-                return False
+                self._datos.append(entidad)
 
         self._guardar_datos()
         return True

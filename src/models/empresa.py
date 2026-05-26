@@ -1,5 +1,9 @@
 class Empresa:
-    def __init__(self, id_e: int, nombre_empresa: str, estado_de_convenio_emp: str):
+    def __init__(self,
+        id_e: int,
+        nombre_empresa: str,
+        estado_de_convenio_emp: str
+    ):
         self.id_e = id_e
         self.nombre_empresa = nombre_empresa
         self.estado_de_convenio_emp = estado_de_convenio_emp
@@ -27,7 +31,7 @@ class Convenio:
 class Oferta:
     def __init__(
         self,
-        id_o: str,
+        id_o: int,
         id_e: int,  # (Clave Foránea -> Empresa)
         descripcion_oferta: str,
         requisitos: str,

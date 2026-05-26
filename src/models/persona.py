@@ -25,7 +25,7 @@ class Estudiante(Persona):
         cedula_dni: str,
         correo_electronico: str,
         direccion: str,
-        ciclo_actual: str,
+        ciclo_actual: int,
         estado_de_matricula: str,
         malla_academica: str,  # Ruta local del archivo PDF
         curriculum_vitae: str,  # Ruta local del archivo PDF
@@ -56,7 +56,7 @@ class Personal(Persona):
         cedula_dni: str,
         correo_electronico: str,
         direccion: str,
-        rol_personal: str,  # "Coordinador", "Tutor Academico", "Tutor Empresarial"
+        rol_personal: str,  # "Coordinador", "Tutor Academico", "Tutor Empresarial", "Administrador" 
     ):
         super().__init__(
             id_p,
@@ -67,6 +67,7 @@ class Personal(Persona):
             rol="Personal",
         )
         self.rol_personal = rol_personal
+
 
 class CoordinadorDePracticas(Personal):
     def __init__(
@@ -125,3 +126,23 @@ class TutorEmpresarial(Personal):
             rol_personal="Tutor Empresarial",
         )
         self.id_e = id_e
+
+
+class Administrador(Personal):
+    def __init__(
+        self,
+        id_p: int,
+        nombre_y_apellido: str,
+        cedula_dni: str,
+        correo_electronico: str,
+        direccion: str,
+    ):
+        super().__init__(
+            id_p,
+            nombre_y_apellido,
+            cedula_dni,
+            correo_electronico,
+            direccion,
+            rol_personal="Administrador",
+        )
+        

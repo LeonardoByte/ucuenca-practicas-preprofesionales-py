@@ -30,7 +30,7 @@ class UsuarioRepository(UsuarioRepositoryABC):
                     self._datos[idx] = entidad
                     break
             else:
-                return False
+                self._datos.append(entidad)
 
         self._guardar_datos()
         return True
@@ -44,9 +44,9 @@ class UsuarioRepository(UsuarioRepositoryABC):
             return True
         return False
 
-    def buscar_por_username(self, username_correo: str) -> Optional[Usuario]:
+    def buscar_por_username(self, username_cedula: str) -> Optional[Usuario]:
         self._cargar_datos()
         for u in self._datos:
-            if u.username_correo == username_correo:
+            if u.username_correo == username_cedula:
                 return u
         return None
