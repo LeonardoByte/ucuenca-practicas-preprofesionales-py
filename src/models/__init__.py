@@ -1,5 +1,22 @@
 from src.models.empresa import Convenio, Empresa, Oferta
+from src.models.estados import (
+    EstadoCartaCompromiso,
+    EstadoConvenio,
+    EstadoFirmaFormulario,
+    EstadoMatricula,
+    EstadoPostulacion,
+    EstadoPractica,
+    EstadoPracticaEstudiante,
+    EstadoSolicitudAutorizacion,
+    EstadoSolicitudOficio,
+    EstadoValidacionActividad,
+    RolPersona,
+    RolPersonal,
+    RolUsuario,
+    TipoFormulario,
+)
 from src.models.persona import (
+    Administrador,
     CoordinadorDePracticas,
     Estudiante,
     Persona,
@@ -13,6 +30,7 @@ from src.models.usuario import Usuario
 
 __all__ = [
     "Persona",
+    "Administrador",
     "Estudiante",
     "Personal",
     "CoordinadorDePracticas",
@@ -29,4 +47,18 @@ __all__ = [
     "Actividad",
     "Formulario",
     "Usuario",
+    "EstadoCartaCompromiso",
+    "EstadoConvenio",
+    "EstadoFirmaFormulario",
+    "EstadoMatricula",
+    "EstadoPostulacion",
+    "EstadoPractica",
+    "EstadoPracticaEstudiante",
+    "EstadoSolicitudAutorizacion",
+    "EstadoSolicitudOficio",
+    "EstadoValidacionActividad",
+    "RolPersona",
+    "RolPersonal",
+    "RolUsuario",
+    "TipoFormulario",
 ]

@@ -11,7 +11,7 @@ def main():
     """Punto de entrada principal del sistema."""
     print("Inicializando Base de Datos SGPP...")
     inicializar_todos_los_dat_semilla()
-    print("✓ Base de Datos SGPP inicializada correctamente.")
+    print("[OK] Base de Datos SGPP inicializada correctamente.")
 
 
 if __name__ == "__main__":

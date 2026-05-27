@@ -1,5 +1,7 @@
 from typing import Optional
 
+from .estados import EstadoCartaCompromiso, EstadoSolicitudAutorizacion, EstadoSolicitudOficio
+
 
 class SolicitudAutorizacion:
     def __init__(
@@ -9,7 +11,7 @@ class SolicitudAutorizacion:
         nombre_empresa: str,
         detalles_empresa: str,
         fecha_solicitud: str,
-        estado_solicitud: str,  # "Pendiente", "Aprobada", "Rechazada"
+        estado_solicitud: EstadoSolicitudAutorizacion,  # "Pendiente", "Aprobada", "Rechazada"
     ):
         self.id_sol_aut = id_sol_aut
         self.id_p_estudiante = id_p_estudiante
@@ -29,7 +31,7 @@ class SolicitudOficio:
         cargo_destinatario: str,
         nombre_empresa: str,
         fecha_solicitud: str,
-        estado_solicitud: str,  # "Pendiente", "Emitida", "Rechazada"
+        estado_solicitud: EstadoSolicitudOficio,  # "Pendiente", "Emitida", "Rechazada"
     ):
         self.id_sol_of = id_sol_of
         self.id_p_estudiante = id_p_estudiante
@@ -48,7 +50,7 @@ class CartaCompromiso:
         id_carta: int,
         id_pr: int,  # (Clave Foránea -> Practica)
         ruta_pdf: str,
-        estado: str,  # "Pendiente", "Entregada", "Firmada"
+        estado: EstadoCartaCompromiso,  # "Pendiente", "Entregada", "Firmada"
     ):
         self.id_carta = id_carta
         self.id_pr = id_pr

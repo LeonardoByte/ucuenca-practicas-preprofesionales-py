@@ -1,14 +1,19 @@
+from .estados import EstadoConvenio
+
+
 class Empresa:
-    def __init__(self,
+    def __init__(
+        self,
         id_e: int,
         nombre_empresa: str,
-        estado_de_convenio_emp: str
+        estado_de_convenio_emp: EstadoConvenio,
+        correo_electronico: str,
     ):
         self.id_e = id_e
         self.nombre_empresa = nombre_empresa
         self.estado_de_convenio_emp = estado_de_convenio_emp
+        self.correo_electronico = correo_electronico
         self.numeros_contacto: list[str] = []  # Resuelve tabla Empresa_Numero_Contacto
-        self.correos_contacto: list[str] = []  # Resuelve tabla Empresa_Correo_Contacto
         self.direcciones: list[str] = []  # Resuelve tabla Empresa_Direccion
 
 
@@ -19,7 +24,7 @@ class Convenio:
         id_e: int,  # (Clave Foránea -> Empresa)
         fecha_firma: str,
         fecha_vencimiento: str,
-        estado_del_convenio: str, # "Activo", "Caducado"
+        estado_del_convenio: EstadoConvenio,
     ):
         self.id_con = id_con
         self.id_e = id_e

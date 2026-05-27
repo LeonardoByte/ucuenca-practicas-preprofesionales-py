@@ -1,5 +1,13 @@
 from typing import Optional
 
+from .estados import (
+    EstadoFirmaFormulario,
+    EstadoPostulacion,
+    EstadoPractica,
+    EstadoValidacionActividad,
+    TipoFormulario,
+)
+
 
 class Postulacion:
     def __init__(
@@ -10,7 +18,7 @@ class Postulacion:
         id_e: int,  # (Clave Foránea -> Empresa)
         id_p_coordinador: int,  # (Clave Foránea -> Coordinador)
         fecha_postulacion: str,
-        estado_de_postulacion: str,  # "Pendiente", "Validada", "Aceptada", "Rechazada"
+        estado_de_postulacion: EstadoPostulacion,  # "Pendiente", "Validada", etc.
     ):
         self.id_pos = id_pos
         self.id_p_estudiante = id_p_estudiante
@@ -31,7 +39,7 @@ class Practica:
         id_p_tutor_emp: int,  # (Clave Foránea -> Profesor)
         fecha_inicio: str,
         fecha_fin: str,
-        estado_de_practica: str,  # "Iniciada", "En Evaluacion", "Finalizada", "Aprobada"
+        estado_de_practica: EstadoPractica,  # "Iniciada", "En Evaluacion", "Finalizada", "Aprobada"
     ):
         self.id_pr = id_pr
         self.id_pos = id_pos
@@ -48,7 +56,7 @@ class Actividad:
         id_act: int,
         id_pr: int,  # (Clave Foránea -> Practica)
         descripcion_de_la_tarea: str,
-        estado_de_validacion: str,  # "Propuesta", "Validada", "Rechazada"
+        estado_de_validacion: EstadoValidacionActividad,  # "Propuesta", "Validada", "Rechazada"
     ):
         self.id_act = id_act
         self.id_pr = id_pr
@@ -61,8 +69,8 @@ class Formulario:
         self,
         id_doc: int,
         id_pr: int,  # (Clave Foránea -> Practica)
-        tipo_formulario: str,  # "Formulario 1", "Formulario 2", "Formulario 3"
-        estado_de_firma: str,  # "Presentado", "Completado", "Aprobado"
+        tipo_formulario: TipoFormulario,  # "Formulario 1", "Formulario 2", "Formulario 3"
+        estado_de_firma: EstadoFirmaFormulario,  # "Presentado", "Completado", "Aprobado"
         fecha_de_entrega_registro: str,
         numero_formulario: str,
     ):

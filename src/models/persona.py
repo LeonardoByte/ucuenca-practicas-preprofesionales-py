@@ -1,3 +1,6 @@
+from .estados import EstadoMatricula, EstadoPracticaEstudiante, RolPersona, RolPersonal
+
+
 class Persona:
     def __init__(
         self,
@@ -6,7 +9,7 @@ class Persona:
         cedula_dni: str,
         correo_electronico: str,
         direccion: str,
-        rol: str,
+        rol: RolPersona,
     ):
         self.id_p = id_p
         self.nombre_y_apellido = nombre_y_apellido
@@ -26,11 +29,11 @@ class Estudiante(Persona):
         correo_electronico: str,
         direccion: str,
         ciclo_actual: int,
-        estado_de_matricula: str,
+        estado_de_matricula: EstadoMatricula,
         malla_academica: str,  # Ruta local del archivo PDF
         curriculum_vitae: str,  # Ruta local del archivo PDF
         historial_practicas: str,
-        estado_practica: str,  # "Sin Practicas", "Activa", "Finalizada"
+        estado_practica: EstadoPracticaEstudiante,
     ):
         super().__init__(
             id_p,
@@ -38,7 +41,7 @@ class Estudiante(Persona):
             cedula_dni,
             correo_electronico,
             direccion,
-            rol="Estudiante",
+            rol=RolPersona.ESTUDIANTE,
         )
         self.ciclo_actual = ciclo_actual
         self.estado_de_matricula = estado_de_matricula
@@ -56,7 +59,7 @@ class Personal(Persona):
         cedula_dni: str,
         correo_electronico: str,
         direccion: str,
-        rol_personal: str,  # "Coordinador", "Tutor Academico", "Tutor Empresarial", "Administrador" 
+        rol_personal: RolPersonal,
     ):
         super().__init__(
             id_p,
@@ -64,7 +67,7 @@ class Personal(Persona):
             cedula_dni,
             correo_electronico,
             direccion,
-            rol="Personal",
+            rol=RolPersona.PERSONAL,
         )
         self.rol_personal = rol_personal
 
@@ -84,7 +87,7 @@ class CoordinadorDePracticas(Personal):
             cedula_dni,
             correo_electronico,
             direccion,
-            rol_personal="Coordinador",
+            rol_personal=RolPersonal.COORDINADOR,
         )
 
 
@@ -103,7 +106,7 @@ class TutorAcademico(Personal):
             cedula_dni,
             correo_electronico,
             direccion,
-            rol_personal="Tutor Academico",
+            rol_personal=RolPersonal.TUTOR_ACADEMICO,
         )
 
 
@@ -123,7 +126,7 @@ class TutorEmpresarial(Personal):
             cedula_dni,
             correo_electronico,
             direccion,
-            rol_personal="Tutor Empresarial",
+            rol_personal=RolPersonal.TUTOR_EMPRESARIAL,
         )
         self.id_e = id_e
 
@@ -143,6 +146,5 @@ class Administrador(Personal):
             cedula_dni,
             correo_electronico,
             direccion,
-            rol_personal="Administrador",
+            rol_personal=RolPersonal.ADMINISTRADOR,
         )
-        
