@@ -2,7 +2,7 @@ from abc import abstractmethod
 from typing import Optional
 
 from src.models import Postulacion
-from src.repositories.interfaces import RepositoryABC
+from src.repositories.interfaces.base_repository_abc import RepositoryABC
 
 
 class PostulacionRepositoryABC(RepositoryABC):
@@ -15,7 +15,7 @@ class PostulacionRepositoryABC(RepositoryABC):
         pass
 
     @abstractmethod
-    def listar_por_oferta_compuesta(self, id_o: str, id_e: int) -> list[Postulacion]:
+    def listar_por_oferta_compuesta(self, id_o: int, id_e: int) -> list[Postulacion]:
         pass
 
     @abstractmethod

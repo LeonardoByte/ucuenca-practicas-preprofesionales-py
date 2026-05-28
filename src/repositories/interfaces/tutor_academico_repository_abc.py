@@ -2,7 +2,7 @@ from abc import abstractmethod
 from typing import Optional
 
 from src.models.persona import TutorAcademico
-from src.repositories.interfaces import RepositoryABC
+from src.repositories.interfaces.base_repository_abc import RepositoryABC
 
 
 class TutorAcademicoRepositoryABC(RepositoryABC):
