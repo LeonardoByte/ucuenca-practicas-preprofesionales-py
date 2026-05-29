@@ -1,11 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import Optional
 
 from src.models import Postulacion
 
 
 class CoordinadorMainServiceABC(ABC):
-    
+
     @abstractmethod
     def revisar_postulaciones_pendientes(self) -> list[Postulacion]:
         """Consulta en PostulacionService los registros cuyo estado es 'Pendiente'."""

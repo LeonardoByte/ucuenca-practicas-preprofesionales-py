@@ -50,3 +50,7 @@ class TutorAcademicoRepository(TutorAcademicoRepositoryABC):
             if t.id_p == id_p:
                 return t
         return None
+
+    def obtener_todos(self) -> list[TutorAcademico]:
+        self._cargar_datos()
+        return list(self._datos)

@@ -1,4 +1,4 @@
-from typing import Optional, Any
+from typing import Any, Optional
 
 from src.services.autenticacion_service import AutenticacionService
 from src.services.interfaces.administrador_main_service_abc import AdministradorMainServiceABC
@@ -12,10 +12,10 @@ class AdministradorMainService(AdministradorMainServiceABC):
         self.autenticacion_service = autenticacion_service or AutenticacionService()
 
     def crear_cuenta_usuario_sistema(
-        self, 
-        username_correo: str, 
-        contrasena: str, 
-        rol: str, 
+        self,
+        username_correo: str,
+        contrasena: str,
+        rol: str,
         datos_perfil: dict
     ) -> Optional[Any]:
         return self.autenticacion_service.registrar_nuevo_perfil_sistema(

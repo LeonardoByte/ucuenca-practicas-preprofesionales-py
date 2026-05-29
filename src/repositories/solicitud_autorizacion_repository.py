@@ -59,3 +59,7 @@ class SolicitudAutorizacionRepository(SolicitudAutorizacionRepositoryABC):
     def listar_por_estudiante(self, id_p_estudiante: int) -> list[SolicitudAutorizacion]:
         self._cargar_datos()
         return [s for s in self._datos if s.id_p_estudiante == id_p_estudiante]
+
+    def obtener_todos(self) -> list[SolicitudAutorizacion]:
+        self._cargar_datos()
+        return list(self._datos)

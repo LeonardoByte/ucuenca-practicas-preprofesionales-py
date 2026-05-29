@@ -1,21 +1,22 @@
-from typing import Optional, Any
+from typing import Any, Optional
+
 from src.models import (
-    Usuario,
-    Estudiante,
+    Administrador,
     CoordinadorDePracticas,
+    Empresa,
+    Estudiante,
     TutorAcademico,
     TutorEmpresarial,
-    Administrador,
-    Empresa,
+    Usuario,
 )
 from src.repositories import (
-    UsuarioRepository,
-    EstudianteRepository,
+    AdministradorRepository,
     CoordinadorRepository,
+    EmpresaRepository,
+    EstudianteRepository,
     TutorAcademicoRepository,
     TutorEmpresarialRepository,
-    AdministradorRepository,
-    EmpresaRepository,
+    UsuarioRepository,
 )
 from src.services.interfaces.autenticacion_service_abc import AutenticacionServiceABC
 

@@ -1,4 +1,4 @@
-from typing import Optional, Any
+from typing import Any, Optional
 
 from src.repositories import UsuarioRepository
 from src.services.autenticacion_service import AutenticacionService

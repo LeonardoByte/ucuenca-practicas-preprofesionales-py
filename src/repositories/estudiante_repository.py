@@ -64,3 +64,7 @@ class EstudianteRepository(EstudianteRepositoryABC):
             if p.id_p == id_p:
                 return p
         return None
+
+    def obtener_todos(self) -> list[Estudiante]:
+        self._cargar_datos()
+        return list(self._datos)

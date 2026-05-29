@@ -65,3 +65,7 @@ class PostulacionRepository(PostulacionRepositoryABC):
     def listar_por_id_terna(self, id_terna: int) -> list[Postulacion]:
         self._cargar_datos()
         return [p for p in self._datos if p.id_terna == id_terna]
+
+    def obtener_todos(self) -> list[Postulacion]:
+        self._cargar_datos()
+        return list(self._datos)

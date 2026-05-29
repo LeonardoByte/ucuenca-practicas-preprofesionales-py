@@ -50,3 +50,7 @@ class EmpresaRepository(EmpresaRepositoryABC):
             if e.id_e == id_e:
                 return e
         return None
+
+    def obtener_todos(self) -> list[Empresa]:
+        self._cargar_datos()
+        return list(self._datos)

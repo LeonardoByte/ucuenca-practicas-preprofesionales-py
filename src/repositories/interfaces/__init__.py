@@ -37,5 +37,5 @@ __all__ = [
     "SolicitudOficioRepositoryABC",
     "TutorAcademicoRepositoryABC",
     "TutorEmpresarialRepositoryABC",
-    "UsuarioRepositoryABC"
+    "UsuarioRepositoryABC",
 ]

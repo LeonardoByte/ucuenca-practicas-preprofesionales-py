@@ -1,6 +1,9 @@
 from typing import Optional
+
+from src.services.interfaces.tutor_empresarial_main_service_abc import (
+    TutorEmpresarialMainServiceABC,
+)
 from src.services.practica_service import PracticaService
-from src.services.interfaces.tutor_empresarial_main_service_abc import TutorEmpresarialMainServiceABC
 
 
 class TutorEmpresarialMainService(TutorEmpresarialMainServiceABC):

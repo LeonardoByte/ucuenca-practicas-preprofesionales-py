@@ -5,7 +5,7 @@ from src.models.empresa import Oferta
 
 
 class OfertaServiceABC(ABC):
-    
+
     @abstractmethod
     def crear_oferta(self, id_e: int, descripcion: str, requisitos: str, fecha_de_publicacion: str, duracion: str, remuneracion: float) -> Optional[Oferta]:
         """Registra una nueva vacante asociada a una empresa específica."""

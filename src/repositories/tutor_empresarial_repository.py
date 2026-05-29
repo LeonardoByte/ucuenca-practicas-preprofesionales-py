@@ -2,7 +2,9 @@ from pathlib import Path
 from typing import Optional
 
 from src.models import TutorEmpresarial
-from src.repositories.interfaces.tutor_empresarial_repository_abc import TutorEmpresarialRepositoryABC
+from src.repositories.interfaces.tutor_empresarial_repository_abc import (
+    TutorEmpresarialRepositoryABC,
+)
 from src.utils.serialization import load_db_dat, save_db_dat
 
 
@@ -54,3 +56,7 @@ class TutorEmpresarialRepository(TutorEmpresarialRepositoryABC):
     def listar_por_empresa(self, id_e: int) -> list[TutorEmpresarial]:
         self._cargar_datos()
         return [t for t in self._datos if t.id_e == id_e]
+
+    def obtener_todos(self) -> list[TutorEmpresarial]:
+        self._cargar_datos()
+        return list(self._datos)

@@ -1,6 +1,7 @@
 from typing import Optional
-from src.services.practica_service import PracticaService
+
 from src.services.interfaces.tutor_academico_main_service_abc import TutorAcademicoMainServiceABC
+from src.services.practica_service import PracticaService
 
 
 class TutorAcademicoMainService(TutorAcademicoMainServiceABC):

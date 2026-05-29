@@ -1,15 +1,16 @@
 from typing import Optional
-from src.models import Practica, Actividad, Formulario, CartaCompromiso
+
+from src.models import Actividad, CartaCompromiso, Formulario, Practica
 from src.repositories import (
-    PracticaRepository,
-    PostulacionRepository,
-    EstudianteRepository,
     ActividadRepository,
-    FormularioRepository,
     CartaCompromisoRepository,
+    EstudianteRepository,
+    FormularioRepository,
+    PostulacionRepository,
+    PracticaRepository,
 )
-from src.services.interfaces.practica_service_abc import PracticaServiceABC
 from src.services.exceptions import EstudianteConPracticaActivaError
+from src.services.interfaces.practica_service_abc import PracticaServiceABC
 
 
 class PracticaService(PracticaServiceABC):

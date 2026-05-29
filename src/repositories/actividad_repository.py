@@ -57,3 +57,7 @@ class ActividadRepository(ActividadRepositoryABC):
     def listar_por_practica(self, id_pr: int) -> list[Actividad]:
         self._cargar_datos()
         return [a for a in self._datos if a.id_pr == id_pr]
+
+    def obtener_todos(self) -> list[Actividad]:
+        self._cargar_datos()
+        return list(self._datos)

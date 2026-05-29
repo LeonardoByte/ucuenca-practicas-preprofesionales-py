@@ -1,21 +1,22 @@
 from typing import Optional
+
 from src.models import (
+    Actividad,
     Oferta,
     Postulacion,
     SolicitudAutorizacion,
     SolicitudOficio,
-    Actividad,
 )
 from src.repositories import (
     EstudianteRepository,
     SolicitudAutorizacionRepository,
     SolicitudOficioRepository,
 )
+from src.services.exceptions import CicloNoPermitidoError, EstudianteConPracticaActivaError
+from src.services.interfaces.estudiante_main_service_abc import EstudianteMainServiceABC
 from src.services.oferta_service import OfertaService
 from src.services.postulacion_service import PostulacionService
 from src.services.practica_service import PracticaService
-from src.services.interfaces.estudiante_main_service_abc import EstudianteMainServiceABC
-from src.services.exceptions import CicloNoPermitidoError, EstudianteConPracticaActivaError
 
 
 class EstudianteMainService(EstudianteMainServiceABC):

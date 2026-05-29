@@ -1,8 +1,9 @@
 from typing import Optional
+
 from src.models import Postulacion
 from src.repositories import PostulacionRepository
-from src.services.interfaces.postulacion_service_abc import PostulacionServiceABC
 from src.services.exceptions import TernaInvalidaError
+from src.services.interfaces.postulacion_service_abc import PostulacionServiceABC
 
 
 class PostulacionService(PostulacionServiceABC):

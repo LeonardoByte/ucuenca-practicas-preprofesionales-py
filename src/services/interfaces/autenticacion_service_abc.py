@@ -1,10 +1,9 @@
 from abc import ABC, abstractmethod
-from typing import Optional, Any
+from typing import Any, Optional
 
-from src.models import Usuario
 
 class AutenticacionServiceABC(ABC):
-    
+
     @abstractmethod
     def verificar_credenciales(
         self,
@@ -20,10 +19,10 @@ class AutenticacionServiceABC(ABC):
 
     @abstractmethod
     def registrar_nuevo_perfil_sistema(
-        self, 
-        username_correo: str, 
-        contrasena: str, 
-        rol: str, 
+        self,
+        username_correo: str,
+        contrasena: str,
+        rol: str,
         datos_perfil: dict  # diccionario con los datos del perfil
     ) -> Optional[Any]:
         """
@@ -38,7 +37,7 @@ class AutenticacionServiceABC(ABC):
 
     @abstractmethod
     def eliminar_cuenta_usuario_sistema(
-        self, 
+        self,
         username_correo: str
     ) -> bool:
         """

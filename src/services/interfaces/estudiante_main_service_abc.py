@@ -1,13 +1,12 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
+from src.models import Actividad, Postulacion, SolicitudAutorizacion, SolicitudOficio
 from src.models.empresa import Oferta
-from src.models import Postulacion, Actividad
-from src.models import SolicitudAutorizacion, SolicitudOficio
 
 
 class EstudianteMainServiceABC(ABC):
-    
+
     @abstractmethod
     def obtener_catalogo_ofertas(self, id_p_estudiante: int) -> list[Oferta]:
         """Usa OfertaService para listar vacantes globales y aplica filtros/lambda basados en el ciclo."""

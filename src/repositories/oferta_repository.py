@@ -77,3 +77,7 @@ class OfertaRepository(OfertaRepositoryABC):
     def listar_ofertas_disponibles(self) -> list[Oferta]:
         self._cargar_datos()
         return list(self._datos)
+
+    def obtener_todos(self) -> list[Oferta]:
+        self._cargar_datos()
+        return list(self._datos)

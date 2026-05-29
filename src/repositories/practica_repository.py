@@ -72,3 +72,7 @@ class PracticaRepository(PracticaRepositoryABC):
 
     def buscar_por_estudiante(self, id_p_estudiante: int) -> Optional[Practica]:
         return self.buscar_practica_activa_estudiante(id_p_estudiante)
+
+    def obtener_todos(self) -> list[Practica]:
+        self._cargar_datos()
+        return list(self._datos)

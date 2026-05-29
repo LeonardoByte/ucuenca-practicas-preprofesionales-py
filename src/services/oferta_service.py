@@ -1,4 +1,5 @@
 from typing import Optional
+
 from src.models import Oferta
 from src.repositories import OfertaRepository
 from src.services.interfaces.oferta_service_abc import OfertaServiceABC

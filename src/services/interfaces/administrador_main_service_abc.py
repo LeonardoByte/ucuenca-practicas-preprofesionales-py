@@ -1,14 +1,15 @@
 from abc import ABC, abstractmethod
-from typing import Optional, Any
+from typing import Any, Optional
+
 
 class AdministradorMainServiceABC(ABC):
 
     @abstractmethod
     def crear_cuenta_usuario_sistema(
-        self, 
-        username_correo: str, 
-        contrasena: str, 
-        rol: str, 
+        self,
+        username_correo: str,
+        contrasena: str,
+        rol: str,
         datos_perfil: dict
     ) -> Optional[Any]:
         """
@@ -20,7 +21,7 @@ class AdministradorMainServiceABC(ABC):
 
     @abstractmethod
     def eliminar_usuario_sistema(
-        self, 
+        self,
         username_correo: str
     ) -> bool:
         """

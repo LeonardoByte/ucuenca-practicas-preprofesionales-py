@@ -1,9 +1,10 @@
-from typing import Optional, Any
+from typing import Optional
+
 from src.models import Oferta, Postulacion
+from src.services.interfaces.empresa_main_service_abc import EmpresaMainServiceABC
 from src.services.oferta_service import OfertaService
 from src.services.postulacion_service import PostulacionService
 from src.services.practica_service import PracticaService
-from src.services.interfaces.empresa_main_service_abc import EmpresaMainServiceABC
 
 
 class EmpresaMainService(EmpresaMainServiceABC):

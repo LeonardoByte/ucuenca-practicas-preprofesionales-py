@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Optional
-from src.models.practica import Practica, Actividad, Formulario
+
+from src.models.practica import Actividad, Formulario, Practica
+
 
 class PracticaServiceABC(ABC):
 

@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from src.models import Oferta
-from src.models import Postulacion
+from src.models import Oferta, Postulacion
+
 
 class EmpresaMainServiceABC(ABC):
-    
+
     @abstractmethod
     def registrar_oferta(self, id_e: int, descripcion_oferta: str, requisitos: str, fecha_de_publicacion: str, duracion: str, remuneracion: float) -> Optional[Oferta]:
         """Delega en OfertaService la creación de una nueva vacante en disco. Retorna None si falla."""

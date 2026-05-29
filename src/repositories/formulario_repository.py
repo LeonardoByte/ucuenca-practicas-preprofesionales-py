@@ -69,3 +69,7 @@ class FormularioRepository(FormularioRepositoryABC):
     def listar_formularios_por_practica(self, id_pr: int) -> list[Formulario]:
         self._cargar_datos()
         return [f for f in self._datos if f.id_pr == id_pr]
+
+    def obtener_todos(self) -> list[Formulario]:
+        self._cargar_datos()
+        return list(self._datos)

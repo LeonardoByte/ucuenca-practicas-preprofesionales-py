@@ -1,9 +1,11 @@
 from abc import ABC, abstractmethod
 from typing import Optional
+
 from src.models.practica import Postulacion
 
+
 class PostulacionServiceABC(ABC):
-    
+
     @abstractmethod
     def registrar_postulacion(self, id_p_estudiante: int, id_o: int, id_e: int, id_p_coordinador: int, fecha_postulacion: str) -> Optional[Postulacion]:
         """Crea una nueva postulación en estado 'Pendiente' para una oferta."""

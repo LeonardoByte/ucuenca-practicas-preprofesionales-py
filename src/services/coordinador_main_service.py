@@ -1,13 +1,14 @@
 from typing import Optional
+
 from src.models import Postulacion
 from src.repositories import (
-    PracticaRepository,
-    FormularioRepository,
     CartaCompromisoRepository,
+    FormularioRepository,
     PostulacionRepository,
+    PracticaRepository,
 )
-from src.services.postulacion_service import PostulacionService
 from src.services.interfaces.coordinador_main_service_abc import CoordinadorMainServiceABC
+from src.services.postulacion_service import PostulacionService
 
 
 class CoordinadorMainService(CoordinadorMainServiceABC):

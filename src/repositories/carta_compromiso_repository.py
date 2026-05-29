@@ -60,3 +60,7 @@ class CartaCompromisoRepository(CartaCompromisoRepositoryABC):
             if c.id_pr == id_pr:
                 return c
         return None
+
+    def obtener_todos(self) -> list[CartaCompromiso]:
+        self._cargar_datos()
+        return list(self._datos)

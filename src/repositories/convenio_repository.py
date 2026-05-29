@@ -60,3 +60,7 @@ class ConvenioRepository(ConvenioRepositoryABC):
             if c.id_e == id_e:
                 return c
         return None
+
+    def obtener_todos(self) -> list[Convenio]:
+        self._cargar_datos()
+        return list(self._datos)

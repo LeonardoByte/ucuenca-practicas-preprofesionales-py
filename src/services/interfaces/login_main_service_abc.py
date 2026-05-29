@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Optional, Any
+from typing import Any, Optional
 
 
 class LoginMainServiceABC(ABC):
@@ -14,4 +14,3 @@ class LoginMainServiceABC(ABC):
         Retorna una tupla con la entidad del usuario autenticado (Estudiante, Empresa, etc.) y su rol (str).
         """
         pass
-    

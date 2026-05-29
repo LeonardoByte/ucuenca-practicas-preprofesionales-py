@@ -50,3 +50,7 @@ class CoordinadorRepository(CoordinadorRepositoryABC):
             if c.id_p == id_p:
                 return c
         return None
+
+    def obtener_todos(self) -> list[CoordinadorDePracticas]:
+        self._cargar_datos()
+        return list(self._datos)

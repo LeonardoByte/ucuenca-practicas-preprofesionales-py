@@ -50,3 +50,7 @@ class UsuarioRepository(UsuarioRepositoryABC):
             if u.username_correo == username_cedula:
                 return u
         return None
+
+    def obtener_todos(self) -> list[Usuario]:
+        self._cargar_datos()
+        return list(self._datos)
