@@ -1,6 +1,6 @@
 from typing import Optional
 
-from src.models import EstadoFirmaFormulario
+from src.models import EstadoFirmaFormulario, TipoFormulario
 from src.services.interfaces.tutor_empresarial_main_service_abc import (
     TutorEmpresarialMainServiceABC,
 )
@@ -16,9 +16,9 @@ class TutorEmpresarialMainService(TutorEmpresarialMainServiceABC):
     ) -> bool:
         form = self.practica_service.actualizar_formulario(
             id_pr=id_pr,
-            tipo_formulario="Formulario 3",
+            tipo_formulario=TipoFormulario.FORMULARIO_3,
             estado_firma=estado_de_firma,
             fecha_entrega=fecha_de_entrega_registro,
-            numero_formulario="FORM-03"
+            numero_formulario="FORM-03",
         )
         return form is not None

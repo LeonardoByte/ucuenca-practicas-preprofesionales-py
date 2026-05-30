@@ -2,6 +2,10 @@ from typing import Optional
 
 from src.models import (
     Actividad,
+    EstadoMatricula,
+    EstadoPracticaEstudiante,
+    EstadoSolicitudAutorizacion,
+    EstadoSolicitudOficio,
     Oferta,
     Postulacion,
     SolicitudAutorizacion,
@@ -52,15 +56,8 @@ class EstudianteMainService(EstudianteMainServiceABC):
 
         ofertas = self.oferta_service.listar_todas_las_ofertas()
 
-        historial_str = (
-            est.historial_practicas.value
-            if hasattr(est.historial_practicas, "value")
-            else est.historial_practicas
-        )
-        has_no_experience = (
-            not historial_str
-            or str(historial_str).strip().lower() in ("", "ninguno", "ninguna")
-        )
+        # El estudiante no tiene experiencia si estado_practica no es FINALIZADA
+        has_no_experience = est.estado_practica != EstadoPracticaEstudiante.FINALIZADA
 
         if has_no_experience:
             # Prioridad: remuneración DESC
@@ -77,23 +74,13 @@ class EstudianteMainService(EstudianteMainServiceABC):
             return None
 
         # Requisitos: ciclo >= 6 y matriculado
-        matriculado_str = (
-            est.estado_de_matricula.value
-            if hasattr(est.estado_de_matricula, "value")
-            else est.estado_de_matricula
-        )
-        if est.ciclo_actual < 6 or str(matriculado_str).upper() != "MATRICULADO":
+        if est.ciclo_actual < 6 or est.estado_de_matricula != EstadoMatricula.MATRICULADO:
             raise RequisitosNoCumplidosError(
                 "El estudiante no cumple los requisitos académicos (matrícula o ciclo)."
             )
 
         # Requisitos: no práctica activa
-        practica_str = (
-            est.estado_practica.value
-            if hasattr(est.estado_practica, "value")
-            else est.estado_practica
-        )
-        if str(practica_str).upper() == "ACTIVA":
+        if est.estado_practica == EstadoPracticaEstudiante.ACTIVA:
             raise EstudianteConPracticaActivaError(
                 "El estudiante ya posee una práctica activa."
             )
@@ -117,7 +104,7 @@ class EstudianteMainService(EstudianteMainServiceABC):
             cargo_destinatario=cargo_destinatario,
             nombre_empresa=nombre_empresa,
             fecha_solicitud=fecha_solicitud,
-            estado_solicitud="Pendiente"
+            estado_solicitud=EstadoSolicitudOficio.PENDIENTE,
         )
         if self.sol_of_repo.guardar(sol):
             return sol
@@ -132,13 +119,24 @@ class EstudianteMainService(EstudianteMainServiceABC):
             nombre_empresa=nombre_empresa,
             detalles_empresa=detalles_empresa,
             fecha_solicitud=fecha_solicitud,
-            estado_solicitud="Pendiente"
+            estado_solicitud=EstadoSolicitudAutorizacion.PENDIENTE,
         )
         if self.sol_aut_repo.guardar(sol):
             return sol
         return None
 
+    def obtener_mis_solicitudes_autorizacion(
+        self, id_p_estudiante: int
+    ) -> list[SolicitudAutorizacion]:
+        return self.sol_aut_repo.listar_por_estudiante(id_p_estudiante)
+
+    def obtener_mis_solicitudes_oficio(
+        self, id_p_estudiante: int
+    ) -> list[SolicitudOficio]:
+        return self.sol_of_repo.listar_por_estudiante(id_p_estudiante)
+
     def registrar_actividad_bitacora(
         self, id_pr: int, descripcion_de_la_tarea: str
     ) -> Optional[Actividad]:
         return self.practica_service.registrar_actividad(id_pr, descripcion_de_la_tarea)
+

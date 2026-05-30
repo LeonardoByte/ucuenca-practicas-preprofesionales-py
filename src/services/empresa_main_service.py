@@ -41,3 +41,8 @@ class EmpresaMainService(EmpresaMainServiceABC):
             id_pos_aceptada, id_p_tutor_emp, fecha_inicio, fecha_fin
         )
         return practica is not None
+
+    def listar_mis_ofertas_publicadas(self, id_e: int) -> list[Oferta]:
+        ofertas = self.oferta_service.listar_todas_las_ofertas()
+        return [o for o in ofertas if o.id_e == id_e]
+

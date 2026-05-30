@@ -38,3 +38,10 @@ class EmpresaMainServiceABC(ABC):
         postulación a 'Aceptada' y rechazar las demás.
         """
         pass
+
+    @abstractmethod
+    def listar_mis_ofertas_publicadas(self, id_e: int) -> list[Oferta]:
+        """Usa OfertaService para jalar el catálogo completo filtrando funcionalmente
+        por el ID de esta empresa.
+        """
+        pass

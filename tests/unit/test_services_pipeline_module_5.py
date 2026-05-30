@@ -6,6 +6,7 @@ personalizadas y flujos de datos para los 11 servicios del sistema.
 
 import pathlib
 import shutil
+
 import pytest
 
 # Store original PurePath.__init__ reference
@@ -24,55 +25,52 @@ def patched_purepath_init(self, *args):
 # Import models
 from src.models import (
     Administrador,
-    Estudiante,
     CoordinadorDePracticas,
-    TutorAcademico,
-    TutorEmpresarial,
     Empresa,
-    Usuario,
-    Oferta,
-    Postulacion,
-    Practica,
-    Actividad,
-    Formulario,
-    CartaCompromiso,
-    SolicitudAutorizacion,
-    SolicitudOficio,
+    EstadoCartaCompromiso,
+    EstadoConvenio,
+    EstadoFirmaFormulario,
+    EstadoMatricula,
     EstadoPostulacion,
     EstadoPractica,
     EstadoPracticaEstudiante,
     EstadoValidacionActividad,
-    EstadoFirmaFormulario,
-    EstadoCartaCompromiso,
-    EstadoMatricula,
-    EstadoConvenio,
+    Estudiante,
+    Postulacion,
+    Practica,
     RolUsuario,
     TipoFormulario,
+    TutorAcademico,
+    TutorEmpresarial,
+    SolicitudAutorizacion,
+    SolicitudOficio,
+    EstadoSolicitudAutorizacion,
+    EstadoSolicitudOficio,
 )
-
-# Import exceptions
-from src.services.exceptions import (
-    CredencialesInvalidasError,
-    CorreoDuplicadoError,
-    RequisitosNoCumplidosError,
-    DocumentacionIncompletaError,
-    EstudianteConPracticaActivaError,
-    TernaInvalidaError,
-    CicloNoPermitidoError,
-)
+from src.services.administrador_main_service import AdministradorMainService
 
 # Import services
 from src.services.autenticacion_service import AutenticacionService
-from src.services.estudiante_main_service import EstudianteMainService
 from src.services.coordinador_main_service import CoordinadorMainService
 from src.services.empresa_main_service import EmpresaMainService
-from src.services.tutor_academico_main_service import TutorAcademicoMainService
-from src.services.tutor_empresarial_main_service import TutorEmpresarialMainService
-from src.services.administrador_main_service import AdministradorMainService
+from src.services.estudiante_main_service import EstudianteMainService
+
+# Import exceptions
+from src.services.exceptions import (
+    CicloNoPermitidoError,
+    CorreoDuplicadoError,
+    CredencialesInvalidasError,
+    DocumentacionIncompletaError,
+    EstudianteConPracticaActivaError,
+    RequisitosNoCumplidosError,
+    TernaInvalidaError,
+)
 from src.services.login_main_service import LoginMainService
 from src.services.oferta_service import OfertaService
 from src.services.postulacion_service import PostulacionService
 from src.services.practica_service import PracticaService
+from src.services.tutor_academico_main_service import TutorAcademicoMainService
+from src.services.tutor_empresarial_main_service import TutorEmpresarialMainService
 
 # Import database initializer
 from src.utils.inicializador_db import inicializar_todos_los_dat_semilla
@@ -242,7 +240,12 @@ def test_estudiante_catalogo_prioridad_con_experiencia():
         username_correo="conexp@unl.edu.ec",
         contrasena="pass",
         rol=RolUsuario.ESTUDIANTE,
-        datos_perfil={"nombre_y_apellido": "Est ConExp", "ciclo_actual": 7, "historial_practicas": "Práctica en TechCorp"}
+        datos_perfil={
+            "nombre_y_apellido": "Est ConExp",
+            "ciclo_actual": 7,
+            "historial_practicas": "Práctica en TechCorp",
+            "estado_practica": EstadoPracticaEstudiante.FINALIZADA
+        }
     )
     # Registrar ofertas
     emp_service.registrar_oferta(1, "Oferta 1", "Req", "2026-05-01", "3 meses", 200.0)
@@ -370,7 +373,7 @@ def test_coordinador_validar_requisitos_alumno():
     inicializar_todos_los_dat_semilla()
 
     post = est_service.solicitar_postulacion(1, 10, 5, "2026-05-29")
-    
+
     # Validar Aprobado -> cambia a VALIDADA
     res1 = coord_service.validar_requisitos_alumno(post.id_pos, aprobado=True)
     assert res1 is True
@@ -429,7 +432,7 @@ def test_coordinador_enviar_terna_exitosa_e_id_autoincremental():
 def test_coordinador_asignar_tutor_a_practica():
     coord_service = CoordinadorMainService()
     practica_service = PracticaService()
-    
+
     # Crear una práctica ficticia
     practica = practica_service.practica_repo.guardar(
         Practica(id_pr=1, id_pos=1, id_p_tutor_acad=0, id_p_tutor_emp=1, fecha_inicio="2026-06-01", fecha_fin="2026-12-01", estado_de_practica=EstadoPractica.INICIADA)
@@ -610,7 +613,7 @@ def test_tutor_empresarial_registrar_evaluacion_formulario3():
 def test_login_main_service_ejecutar_ingreso_exitoso():
     inicializar_todos_los_dat_semilla()
     login_service = LoginMainService()
-    
+
     # login exitoso del administrador
     profile, rol = login_service.ejecutar_ingreso("sofia.ramirez@unl.edu.ec", "pass123")
     assert profile is not None
@@ -653,7 +656,6 @@ def test_postulacion_service_cambiar_estado():
 def test_practica_service_formalizar_error_estudiante_con_practica_activa():
     auth_service = AutenticacionService()
     practica_service = PracticaService()
-    est_service = EstudianteMainService()
     inicializar_todos_los_dat_semilla()
 
     # Registrar estudiante con práctica activa
@@ -681,3 +683,103 @@ def test_administrador_crear_y_eliminar_perfil():
     assert isinstance(profile, Administrador)
 
     assert admin_service.eliminar_usuario_sistema("newadmin@unl.edu.ec") is True
+
+
+def test_empresa_listar_mis_ofertas_publicadas():
+    emp_service = EmpresaMainService()
+    inicializar_todos_los_dat_semilla()
+
+    emp_service.registrar_oferta(10, "Python Developer", "Requirements", "2026-05-30", "3 meses", 500.0)
+    emp_service.registrar_oferta(10, "FastAPI Developer", "Requirements", "2026-05-30", "6 meses", 600.0)
+    emp_service.registrar_oferta(20, "Other Company Job", "Requirements", "2026-05-30", "3 meses", 400.0)
+
+    ofertas = emp_service.listar_mis_ofertas_publicadas(10)
+    assert len(ofertas) == 2
+    assert all(o.id_e == 10 for o in ofertas)
+
+
+def test_estudiante_listar_mis_solicitudes_historial():
+    auth_service = AutenticacionService()
+    est_service = EstudianteMainService()
+    inicializar_todos_los_dat_semilla()
+
+    est = auth_service.registrar_nuevo_perfil_sistema(
+        username_correo="solhist@unl.edu.ec", contrasena="pass", rol=RolUsuario.ESTUDIANTE,
+        datos_perfil={"nombre_y_apellido": "Est Hist"}
+    )
+
+    est_service.registrar_solicitud_autorizacion(est.id_p, "Company A", "Details A", "2026-05-30")
+    est_service.registrar_solicitud_oficio(est.id_p, "Dr. Smith", "Director", "Company B", "2026-05-30")
+
+    sol_aut = est_service.obtener_mis_solicitudes_autorizacion(est.id_p)
+    sol_of = est_service.obtener_mis_solicitudes_oficio(est.id_p)
+
+    assert len(sol_aut) == 1
+    assert sol_aut[0].nombre_empresa == "Company A"
+    assert len(sol_of) == 1
+    assert sol_of[0].nombre_destinatario == "Dr. Smith"
+
+
+def test_coordinador_listar_solicitudes_pendientes():
+    auth_service = AutenticacionService()
+    est_service = EstudianteMainService()
+    coord_service = CoordinadorMainService()
+    inicializar_todos_los_dat_semilla()
+
+    est = auth_service.registrar_nuevo_perfil_sistema(
+        username_correo="coordhist@unl.edu.ec", contrasena="pass", rol=RolUsuario.ESTUDIANTE,
+        datos_perfil={"nombre_y_apellido": "Est CoordHist"}
+    )
+
+    est_service.registrar_solicitud_autorizacion(est.id_p, "Company A", "Details A", "2026-05-30")
+    est_service.registrar_solicitud_oficio(est.id_p, "Dr. Smith", "Director", "Company B", "2026-05-30")
+
+    sol_aut_pend = coord_service.listar_solicitudes_autorizacion_pendientes()
+    sol_of_pend = coord_service.listar_solicitudes_oficio_pendientes()
+
+    assert len(sol_aut_pend) == 1
+    assert sol_aut_pend[0].estado_solicitud == EstadoSolicitudAutorizacion.PENDIENTE
+    assert len(sol_of_pend) == 1
+    assert sol_of_pend[0].estado_solicitud == EstadoSolicitudOficio.PENDIENTE
+
+
+def test_practica_service_formalizar_rechazo_masivo_y_formulario1():
+    auth_service = AutenticacionService()
+    est_service = EstudianteMainService()
+    practica_service = PracticaService()
+    inicializar_todos_los_dat_semilla()
+
+    # Registrar el estudiante
+    est = auth_service.registrar_nuevo_perfil_sistema(
+        username_correo="studwinner@unl.edu.ec", contrasena="pass", rol=RolUsuario.ESTUDIANTE,
+        datos_perfil={"nombre_y_apellido": "Winner Stud", "ciclo_actual": 7, "estado_de_matricula": EstadoMatricula.MATRICULADO}
+    )
+
+    # Crear 3 postulaciones para este estudiante (ofertas diferentes)
+    p1 = est_service.solicitar_postulacion(est.id_p, 100, 10, "2026-05-30")
+    p2 = est_service.solicitar_postulacion(est.id_p, 200, 10, "2026-05-30")
+    p3 = est_service.solicitar_postulacion(est.id_p, 300, 10, "2026-05-30")
+
+    # Validar todas las postulaciones
+    post_service = PostulacionService()
+    post_service.cambiar_estado(p1.id_pos, EstadoPostulacion.VALIDADA)
+    post_service.cambiar_estado(p2.id_pos, EstadoPostulacion.VALIDADA)
+    post_service.cambiar_estado(p3.id_pos, EstadoPostulacion.VALIDADA)
+
+    # Formalizar la práctica aceptando p1
+    practica = practica_service.formalizar_practica(p1.id_pos, 50, "2026-06-01", "2026-12-01")
+    assert practica is not None
+
+    # Verificar que p1 es ACEPTADA y p2, p3 son RECHAZADA (rechazo masivo de postulaciones activas)
+    p1_up = post_service.buscar_postulacion_por_id(p1.id_pos)
+    p2_up = post_service.buscar_postulacion_por_id(p2.id_pos)
+    p3_up = post_service.buscar_postulacion_por_id(p3.id_pos)
+
+    assert p1_up.estado_de_postulacion == EstadoPostulacion.ACEPTADA
+    assert p2_up.estado_de_postulacion == EstadoPostulacion.RECHAZADA
+    assert p3_up.estado_de_postulacion == EstadoPostulacion.RECHAZADA
+
+    # Verificar que el Formulario 1 fue registrado automáticamente en estado PRESENTADO
+    forms = practica_service.formulario_repo.listar_formularios_por_practica(practica.id_pr)
+    f1 = [f for f in forms if f.tipo_formulario == TipoFormulario.FORMULARIO_1][0]
+    assert f1.estado_de_firma == EstadoFirmaFormulario.PRESENTADO

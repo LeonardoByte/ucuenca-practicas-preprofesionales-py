@@ -41,35 +41,38 @@ class PostulacionService(PostulacionServiceABC):
     def buscar_postulacion_por_id(self, id_pos: int) -> Optional[Postulacion]:
         return self.repo.buscar_por_id(id_pos)
 
+    def _actualizar_y_guardar_terna(self, p: Postulacion, next_terna_id: int) -> bool:
+        p.id_terna = next_terna_id
+        return self.repo.guardar(p)
+
     def agrupar_y_despachar_terna(self, id_postulaciones: list[int]) -> bool:
         if len(id_postulaciones) != 3:
             raise TernaInvalidaError(
                 "Una terna debe estar compuesta por exactamente 3 postulaciones."
             )
 
-        postulaciones = []
-        for id_pos in id_postulaciones:
-            post = self.repo.buscar_por_id(id_pos)
-            if not post:
-                raise TernaInvalidaError(f"La postulación con ID {id_pos} no existe.")
-            postulaciones.append(post)
+        # Cargar postulaciones usando list comprehension sin bucle for
+        postulaciones = [self.repo.buscar_por_id(id_pos) for id_pos in id_postulaciones]
+
+        # Verificar si alguna postulación no existe
+        if any(p is None for p in postulaciones):
+            raise TernaInvalidaError("Una o más postulaciones de la terna no existen.")
 
         # Verificar homogeneidad: misma oferta y empresa
-        first = postulaciones[0]
-        for p in postulaciones[1:]:
-            if p.id_o != first.id_o or p.id_e != first.id_e:
-                raise TernaInvalidaError(
-                    "Todas las postulaciones de la terna deben ser para la misma oferta y empresa."
-                )
+        same_offer = len({p.id_o for p in postulaciones}) == 1
+        same_company = len({p.id_e for p in postulaciones}) == 1
+        if not same_offer or not same_company:
+            raise TernaInvalidaError(
+                "Todas las postulaciones de la terna deben ser para la misma oferta y empresa."
+            )
 
         # Obtener un id_terna único autoincremental
         self.repo._cargar_datos()
         ternas = [p.id_terna for p in self.repo._datos if p.id_terna is not None]
         next_terna_id = max(ternas) + 1 if ternas else 1
 
-        for p in postulaciones:
-            p.id_terna = next_terna_id
-            self.repo.guardar(p)
+        # Ejecutar mutaciones y guardar de forma funcional
+        [self._actualizar_y_guardar_terna(p, next_terna_id) for p in postulaciones]
 
         return True
 

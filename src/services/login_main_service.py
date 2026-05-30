@@ -31,5 +31,5 @@ class LoginMainService(LoginMainServiceABC):
         if not user:
             return None, ""
 
-        rol_str = user.rol.value if hasattr(user.rol, "value") else user.rol
-        return profile, str(rol_str)
+        # user.rol es un RolUsuario (str, Enum), que es subclase de str
+        return profile, user.rol

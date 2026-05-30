@@ -1,10 +1,17 @@
 from typing import Optional
 
 from src.models import (
+    EstadoCartaCompromiso,
+    EstadoFirmaFormulario,
     EstadoPostulacion,
     EstadoPractica,
     EstadoPracticaEstudiante,
+    EstadoSolicitudAutorizacion,
+    EstadoSolicitudOficio,
     Postulacion,
+    SolicitudAutorizacion,
+    SolicitudOficio,
+    TipoFormulario,
 )
 from src.repositories import (
     CartaCompromisoRepository,
@@ -12,6 +19,8 @@ from src.repositories import (
     FormularioRepository,
     PostulacionRepository,
     PracticaRepository,
+    SolicitudAutorizacionRepository,
+    SolicitudOficioRepository,
 )
 from src.services.exceptions import DocumentacionIncompletaError
 from src.services.interfaces.coordinador_main_service_abc import CoordinadorMainServiceABC
@@ -27,6 +36,8 @@ class CoordinadorMainService(CoordinadorMainServiceABC):
         carta_repo: Optional[CartaCompromisoRepository] = None,
         estudiante_repo: Optional[EstudianteRepository] = None,
         postulacion_service: Optional[PostulacionService] = None,
+        sol_aut_repo: Optional[SolicitudAutorizacionRepository] = None,
+        sol_of_repo: Optional[SolicitudOficioRepository] = None,
     ) -> None:
         self.postulacion_repo = postulacion_repo or PostulacionRepository()
         self.practica_repo = practica_repo or PracticaRepository()
@@ -34,19 +45,16 @@ class CoordinadorMainService(CoordinadorMainServiceABC):
         self.carta_repo = carta_repo or CartaCompromisoRepository()
         self.estudiante_repo = estudiante_repo or EstudianteRepository()
         self.postulacion_service = postulacion_service or PostulacionService()
+        self.sol_aut_repo = sol_aut_repo or SolicitudAutorizacionRepository()
+        self.sol_of_repo = sol_of_repo or SolicitudOficioRepository()
 
     def revisar_postulaciones_pendientes(self) -> list[Postulacion]:
         self.postulacion_repo._cargar_datos()
-        pendientes = []
-        for p in self.postulacion_repo._datos:
-            est_str = (
-                p.estado_de_postulacion.value
-                if hasattr(p.estado_de_postulacion, "value")
-                else p.estado_de_postulacion
-            )
-            if str(est_str).strip().lower() == "pendiente":
-                pendientes.append(p)
-        return pendientes
+        # Filtrado funcional sin bucle for
+        return [
+            p for p in self.postulacion_repo._datos
+            if p.estado_de_postulacion == EstadoPostulacion.PENDIENTE
+        ]
 
     def validar_requisitos_alumno(self, id_pos: int, aprobado: bool) -> bool:
         nuevo_estado = (
@@ -73,40 +81,25 @@ class CoordinadorMainService(CoordinadorMainServiceABC):
 
         # 1. Obtener y verificar los formularios (1, 2, 3)
         formularios = self.formulario_repo.listar_formularios_por_practica(id_pr)
-        tipos_encontrados = {}
-        for f in formularios:
-            val_str = (
-                f.estado_de_firma.value
-                if hasattr(f.estado_de_firma, "value")
-                else f.estado_de_firma
-            )
-            tipo_str = (
-                f.tipo_formulario.value
-                if hasattr(f.tipo_formulario, "value")
-                else f.tipo_formulario
-            )
-            tipos_encontrados[str(tipo_str)] = str(val_str)
+        required_types = {
+            TipoFormulario.FORMULARIO_1,
+            TipoFormulario.FORMULARIO_2,
+            TipoFormulario.FORMULARIO_3,
+        }
+        valid_states = {EstadoFirmaFormulario.COMPLETADO, EstadoFirmaFormulario.APROBADO}
 
-        incompleto = False
-        for f_tipo in ["Formulario 1", "Formulario 2", "Formulario 3"]:
-            if (
-                f_tipo not in tipos_encontrados
-                or tipos_encontrados[f_tipo] not in ["Completado", "Aprobado"]
-            ):
-                incompleto = True
-                break
+        valid_forms = [
+            f for f in formularios
+            if f.tipo_formulario in required_types and f.estado_de_firma in valid_states
+        ]
+        valid_types = {f.tipo_formulario for f in valid_forms}
+        forms_complete = (valid_types == required_types)
 
         # 2. Obtener y verificar la Carta de Compromiso
         carta = self.carta_repo.buscar_por_practica(id_pr)
-        carta_estado = (
-            carta.estado.value
-            if carta and hasattr(carta.estado, "value")
-            else (carta.estado if carta else None)
-        )
-        if not carta or str(carta_estado) != "Firmada":
-            incompleto = True
+        carta_complete = (carta is not None and carta.estado == EstadoCartaCompromiso.FIRMADA)
 
-        if incompleto:
+        if not forms_complete or not carta_complete:
             raise DocumentacionIncompletaError(
                 "Faltan firmas o formularios obligatorios para completar la práctica."
             )
@@ -123,3 +116,18 @@ class CoordinadorMainService(CoordinadorMainServiceABC):
                     self.estudiante_repo.guardar(estudiante)
             return True
         return False
+
+    def listar_solicitudes_autorizacion_pendientes(self) -> list[SolicitudAutorizacion]:
+        self.sol_aut_repo._cargar_datos()
+        return [
+            s for s in self.sol_aut_repo._datos
+            if s.estado_solicitud == EstadoSolicitudAutorizacion.PENDIENTE
+        ]
+
+    def listar_solicitudes_oficio_pendientes(self) -> list[SolicitudOficio]:
+        self.sol_of_repo._cargar_datos()
+        return [
+            s for s in self.sol_of_repo._datos
+            if s.estado_solicitud == EstadoSolicitudOficio.PENDIENTE
+        ]
+

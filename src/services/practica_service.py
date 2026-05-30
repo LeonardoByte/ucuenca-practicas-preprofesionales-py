@@ -5,9 +5,12 @@ from src.models import (
     CartaCompromiso,
     EstadoCartaCompromiso,
     EstadoFirmaFormulario,
+    EstadoPostulacion,
     EstadoPractica,
+    EstadoPracticaEstudiante,
     EstadoValidacionActividad,
     Formulario,
+    Postulacion,
     Practica,
     TipoFormulario,
 )
@@ -40,6 +43,10 @@ class PracticaService(PracticaServiceABC):
         self.formulario_repo = formulario_repo or FormularioRepository()
         self.carta_repo = carta_repo or CartaCompromisoRepository()
 
+    def _rechazar_y_guardar_postulacion(self, p: Postulacion) -> bool:
+        p.estado_de_postulacion = EstadoPostulacion.RECHAZADA
+        return self.postulacion_repo.guardar(p)
+
     def formalizar_practica(
         self, id_pos_aceptada: int, id_p_tutor_emp: int, fecha_inicio: str, fecha_fin: str
     ) -> Optional[Practica]:
@@ -52,29 +59,34 @@ class PracticaService(PracticaServiceABC):
             return None
 
         # Verificar concurrencia
-        est_practica_str = (
-            estudiante.estado_practica.value
-            if hasattr(estudiante.estado_practica, "value")
-            else estudiante.estado_practica
-        )
-        if str(est_practica_str).upper() == "ACTIVA":
+        if estudiante.estado_practica == EstadoPracticaEstudiante.ACTIVA:
             raise EstudianteConPracticaActivaError(
                 f"El estudiante {estudiante.nombre_y_apellido} ya posee una práctica activa."
             )
 
         # Aceptar la postulación
-        post.estado_de_postulacion = "Aceptada"
+        post.estado_de_postulacion = EstadoPostulacion.ACEPTADA
         self.postulacion_repo.guardar(post)
 
-        # Rechazar las demás postulaciones de la misma oferta
+        # Rechazar otras postulaciones de la oferta y postulaciones activas del estudiante ganador
         self.postulacion_repo._cargar_datos()
-        for p in self.postulacion_repo._datos:
-            if p.id_o == post.id_o and p.id_pos != post.id_pos:
-                p.estado_de_postulacion = "Rechazada"
-                self.postulacion_repo.guardar(p)
+        post_a_rechazar = [
+            p for p in self.postulacion_repo._datos
+            if p.id_pos != post.id_pos and (
+                p.id_o == post.id_o
+                or (
+                    p.id_p_estudiante == post.id_p_estudiante
+                    and p.estado_de_postulacion in {
+                        EstadoPostulacion.PENDIENTE,
+                        EstadoPostulacion.VALIDADA,
+                    }
+                )
+            )
+        ]
+        [self._rechazar_y_guardar_postulacion(p) for p in post_a_rechazar]
 
         # Cambiar el estado del estudiante a activo
-        estudiante.estado_practica = "Activa"
+        estudiante.estado_practica = EstadoPracticaEstudiante.ACTIVA
         self.estudiante_repo.guardar(estudiante)
 
         # Crear y guardar la práctica
@@ -88,6 +100,14 @@ class PracticaService(PracticaServiceABC):
             estado_de_practica=EstadoPractica.INICIADA
         )
         if self.practica_repo.guardar(practica):
+            # Registrar automáticamente el Formulario 1 en estado PRESENTADO
+            self.actualizar_formulario(
+                id_pr=practica.id_pr,
+                tipo_formulario=TipoFormulario.FORMULARIO_1,
+                estado_firma=EstadoFirmaFormulario.PRESENTADO,
+                fecha_entrega=fecha_inicio,
+                numero_formulario="FORM-01"
+            )
             return practica
         return None
 
@@ -125,23 +145,10 @@ class PracticaService(PracticaServiceABC):
         numero_formulario: str,
     ) -> Optional[Formulario]:
         formularios = self.formulario_repo.listar_formularios_por_practica(id_pr)
-        target_form = None
 
-        tipo_form_str = (
-            tipo_formulario.value
-            if hasattr(tipo_formulario, "value")
-            else tipo_formulario
-        )
-
-        for f in formularios:
-            f_tipo_str = (
-                f.tipo_formulario.value
-                if hasattr(f.tipo_formulario, "value")
-                else f.tipo_formulario
-            )
-            if str(f_tipo_str) == str(tipo_form_str):
-                target_form = f
-                break
+        # Búsqueda funcional sin bucle for de filtrado
+        matching_forms = [f for f in formularios if f.tipo_formulario == tipo_formulario]
+        target_form = matching_forms[0] if matching_forms else None
 
         if target_form:
             target_form.estado_de_firma = estado_firma

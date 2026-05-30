@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from src.models import Postulacion
+from src.models import Postulacion, SolicitudAutorizacion, SolicitudOficio
 
 
 class CoordinadorMainServiceABC(ABC):
@@ -36,4 +36,14 @@ class CoordinadorMainServiceABC(ABC):
         Aduana Zero-Trust: Verifica que los formularios 2 y 3
         estén 'Completado' y la Carta Compromiso 'Firmada'.
         """
+        pass
+
+    @abstractmethod
+    def listar_solicitudes_autorizacion_pendientes(self) -> list[SolicitudAutorizacion]:
+        """Listar las solicitudes globales pendientes de autorización."""
+        pass
+
+    @abstractmethod
+    def listar_solicitudes_oficio_pendientes(self) -> list[SolicitudOficio]:
+        """Listar las solicitudes globales pendientes de oficio."""
         pass

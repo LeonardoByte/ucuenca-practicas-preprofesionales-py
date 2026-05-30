@@ -43,6 +43,24 @@ class EstudianteMainServiceABC(ABC):
         pass
 
     @abstractmethod
+    def obtener_mis_solicitudes_autorizacion(
+        self, id_p_estudiante: int
+    ) -> list[SolicitudAutorizacion]:
+        """
+        Retorna historial de autorizaciones según el ID del estudiante.
+        """
+        pass
+
+    @abstractmethod
+    def obtener_mis_solicitudes_oficio(
+        self, id_p_estudiante: int
+    ) -> list[SolicitudOficio]:
+        """
+        Retorna historial de oficios emitidos según el ID del estudiante.
+        """
+        pass
+
+    @abstractmethod
     def registrar_actividad_bitacora(
         self, id_pr: int, descripcion_de_la_tarea: str
     ) -> Optional[Actividad]:
