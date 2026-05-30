@@ -1,18 +1,24 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from src.models.practica import Postulacion
+from src.models import EstadoPostulacion, Postulacion
 
 
 class PostulacionServiceABC(ABC):
-
     @abstractmethod
-    def registrar_postulacion(self, id_p_estudiante: int, id_o: int, id_e: int, id_p_coordinador: int, fecha_postulacion: str) -> Optional[Postulacion]:
+    def registrar_postulacion(
+        self,
+        id_p_estudiante: int,
+        id_o: int,
+        id_e: int,
+        id_p_coordinador: Optional[int],
+        fecha_postulacion: str,
+    ) -> Optional[Postulacion]:
         """Crea una nueva postulación en estado 'Pendiente' para una oferta."""
         pass
 
     @abstractmethod
-    def cambiar_estado(self, id_pos: int, nuevo_estado: str) -> bool:
+    def cambiar_estado(self, id_pos: int, nuevo_estado: EstadoPostulacion) -> bool:
         """Actualiza el estado transaccional de una postulación específica."""
         pass
 

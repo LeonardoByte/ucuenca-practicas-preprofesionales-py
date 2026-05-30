@@ -1,15 +1,12 @@
 from abc import ABC, abstractmethod
 from typing import Any, Optional
 
+from src.models import RolUsuario
+
 
 class AutenticacionServiceABC(ABC):
-
     @abstractmethod
-    def verificar_credenciales(
-        self,
-        correo_electronico: str,
-        contrasena: str
-    ) -> Optional[Any]:
+    def verificar_credenciales(self, correo_electronico: str, contrasena: str) -> Optional[Any]:
         """
         Valida el correo electrónico y la contraseña en UsuarioRepository.
         Si coincide, utiliza el rol para buscar y retornar la entidad de perfil completa
@@ -22,8 +19,8 @@ class AutenticacionServiceABC(ABC):
         self,
         username_correo: str,
         contrasena: str,
-        rol: str,
-        datos_perfil: dict  # diccionario con los datos del perfil
+        rol: RolUsuario,
+        datos_perfil: dict,  # diccionario con los datos del perfil
     ) -> Optional[Any]:
         """
         Orquesta el registro completo en el backend:
@@ -36,10 +33,7 @@ class AutenticacionServiceABC(ABC):
         pass
 
     @abstractmethod
-    def eliminar_cuenta_usuario_sistema(
-        self,
-        username_correo: str
-    ) -> bool:
+    def eliminar_cuenta_usuario_sistema(self, username_correo: str) -> bool:
         """
         Elimina completamente un usuario del sistema, borrando su registro
         en el archivo correspondiente (.dat) de su perfil y en usuarios.dat.

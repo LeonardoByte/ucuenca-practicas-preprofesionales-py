@@ -4,7 +4,6 @@ from src.models import Postulacion
 
 
 class CoordinadorMainServiceABC(ABC):
-
     @abstractmethod
     def revisar_postulaciones_pendientes(self) -> list[Postulacion]:
         """Consulta en PostulacionService los registros cuyo estado es 'Pendiente'."""
@@ -12,15 +11,29 @@ class CoordinadorMainServiceABC(ABC):
 
     @abstractmethod
     def validar_requisitos_alumno(self, id_pos: int, aprobado: bool) -> bool:
-        """Modifica el estado a 'Validada' o 'Rechazada' usando PostulacionService. Devuelve False si no se guardó."""
+        """
+        Modifica el estado a 'Validada' o 'Rechazada' usando PostulacionService.
+        Devuelve False si no se guardó.
+        """
         pass
 
     @abstractmethod
     def enviar_terna_a_empresa(self, id_postulaciones: list[int]) -> bool:
-        """Invoca a PostulacionService para estampar un id_terna único al bloque de candidatos validados."""
+        """
+        Invoca a PostulacionService para estampar un id_terna único
+        al bloque de candidatos validados.
+        """
+        pass
+
+    @abstractmethod
+    def asignar_tutor_a_practica(self, id_pr: int, id_p_tutor_acad: int) -> bool:
+        """Asigna un tutor académico a una práctica activa."""
         pass
 
     @abstractmethod
     def ejecutar_cierre_oficial_practica(self, id_pr: int) -> bool:
-        """Aduana Zero-Trust: Verifica que los formularios 2 y 3 estén 'Completado' y la Carta Compromiso 'Firmada'."""
+        """
+        Aduana Zero-Trust: Verifica que los formularios 2 y 3
+        estén 'Completado' y la Carta Compromiso 'Firmada'.
+        """
         pass

@@ -1,16 +1,13 @@
 from abc import ABC, abstractmethod
 from typing import Any, Optional
 
+from src.models import RolUsuario
+
 
 class AdministradorMainServiceABC(ABC):
-
     @abstractmethod
     def crear_cuenta_usuario_sistema(
-        self,
-        username_correo: str,
-        contrasena: str,
-        rol: str,
-        datos_perfil: dict
+        self, username_correo: str, contrasena: str, rol: RolUsuario, datos_perfil: dict
     ) -> Optional[Any]:
         """
         El Administrador es el ÚNICO con autorización para llamar a este método.
@@ -20,10 +17,7 @@ class AdministradorMainServiceABC(ABC):
         pass
 
     @abstractmethod
-    def eliminar_usuario_sistema(
-        self,
-        username_correo: str
-    ) -> bool:
+    def eliminar_usuario_sistema(self, username_correo: str) -> bool:
         """
         El Administrador es el ÚNICO con autorización para llamar a este método.
         Elimina completamente un usuario del sistema, borrando su registro
