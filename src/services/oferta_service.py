@@ -1,6 +1,6 @@
 from typing import Optional
 
-from src.models import Oferta
+from src.models.empresa import Oferta
 from src.repositories import OfertaRepository
 from src.services.interfaces.oferta_service_abc import OfertaServiceABC
 
@@ -16,7 +16,7 @@ class OfertaService(OfertaServiceABC):
         requisitos: str,
         fecha_de_publicacion: str,
         duracion: str,
-        remuneracion: float
+        remuneracion: float,
     ) -> Optional[Oferta]:
         oferta = Oferta(
             id_o=0,
@@ -25,7 +25,7 @@ class OfertaService(OfertaServiceABC):
             requisitos=requisitos,
             fecha_de_publicacion=fecha_de_publicacion,
             duracion=duracion,
-            remuneracion=remuneracion
+            remuneracion=remuneracion,
         )
         if self.repo.guardar(oferta):
             return oferta
@@ -35,4 +35,5 @@ class OfertaService(OfertaServiceABC):
         return self.repo.buscar_por_id(id_o)
 
     def listar_todas_las_ofertas(self) -> list[Oferta]:
-        return self.repo.listar_todas()
+        self.repo._cargar_datos()
+        return self.repo._datos

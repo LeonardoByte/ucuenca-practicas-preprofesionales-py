@@ -25,7 +25,7 @@ class EmpresaMainService(EmpresaMainServiceABC):
         requisitos: str,
         fecha_de_publicacion: str,
         duracion: str,
-        remuneracion: float
+        remuneracion: float,
     ) -> Optional[Oferta]:
         return self.oferta_service.crear_oferta(
             id_e, descripcion_oferta, requisitos, fecha_de_publicacion, duracion, remuneracion
@@ -35,14 +35,9 @@ class EmpresaMainService(EmpresaMainServiceABC):
         return self.postulacion_service.listar_por_id_terna(id_terna)
 
     def seleccionar_candidato_ganador(
-        self,
-        id_pos_aceptada: int,
-        id_p_tutor_acad: int,
-        id_p_tutor_emp: int,
-        fecha_inicio: str,
-        fecha_fin: str
+        self, id_pos_aceptada: int, id_p_tutor_emp: int, fecha_inicio: str, fecha_fin: str
     ) -> bool:
         practica = self.practica_service.formalizar_practica(
-            id_pos_aceptada, id_p_tutor_acad, id_p_tutor_emp, fecha_inicio, fecha_fin
+            id_pos_aceptada, id_p_tutor_emp, fecha_inicio, fecha_fin
         )
         return practica is not None

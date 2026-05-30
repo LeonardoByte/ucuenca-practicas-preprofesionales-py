@@ -5,6 +5,7 @@ from src.models import (
     CoordinadorDePracticas,
     Empresa,
     Estudiante,
+    RolUsuario,
     TutorAcademico,
     TutorEmpresarial,
     Usuario,
@@ -17,6 +18,10 @@ from src.repositories import (
     TutorAcademicoRepository,
     TutorEmpresarialRepository,
     UsuarioRepository,
+)
+from src.services.exceptions import (
+    CorreoDuplicadoError,
+    CredencialesInvalidasError,
 )
 from src.services.interfaces.autenticacion_service_abc import AutenticacionServiceABC
 
@@ -40,13 +45,17 @@ class AutenticacionService(AutenticacionServiceABC):
         self.empresa_repo = empresa_repo or EmpresaRepository()
         self.administrador_repo = administrador_repo or AdministradorRepository()
 
-    def verificar_credenciales(self, correo_electronico: str, contrasena: str) -> Optional[Any]:
+    def verificar_credenciales(
+        self, correo_electronico: str, contrasena: str
+    ) -> Optional[Any]:
         user = self.usuario_repo.buscar_por_username(correo_electronico)
         if not user or user.contrasena != contrasena:
-            return None
+            raise CredencialesInvalidasError(
+                "El usuario no existe o la contraseña ingresada es incorrecta."
+            )
 
-        # Dependiendo del rol, buscar y retornar la entidad de perfil completa
-        match user.rol:
+        rol_str = user.rol.value if hasattr(user.rol, "value") else user.rol
+        match rol_str:
             case "Estudiante":
                 return self.estudiante_repo.buscar_por_id(user.id_p)
             case "Coordinador":
@@ -55,30 +64,33 @@ class AutenticacionService(AutenticacionServiceABC):
                 return self.tutor_acad_repo.buscar_por_id(user.id_p)
             case "Tutor Empresarial":
                 return self.tutor_emp_repo.buscar_por_id(user.id_p)
-            case "Empresa":
+            case "Empresa" | "Empresario":
                 return self.empresa_repo.buscar_por_id(user.id_p)
             case "Administrador":
                 return self.administrador_repo.buscar_por_id(user.id_p)
             case _:
-                return None
+                raise CredencialesInvalidasError(
+                    "El usuario no existe o la contraseña ingresada es incorrecta."
+                )
 
     def registrar_nuevo_perfil_sistema(
         self,
         username_correo: str,
         contrasena: str,
-        rol: str,
+        rol: RolUsuario,
         datos_perfil: dict
     ) -> Optional[Any]:
-        # Validar que el username_correo no exista
         existing_user = self.usuario_repo.buscar_por_username(username_correo)
         if existing_user:
-            return None
+            raise CorreoDuplicadoError(
+                "El correo electrónico ya se encuentra registrado en el sistema."
+            )
 
         profile_entity = None
         profile_id = 0
+        rol_str = rol.value if hasattr(rol, "value") else rol
 
-        # Crear y persistir el perfil en su respectivo repo para obtener el ID auto-generado
-        match rol:
+        match rol_str:
             case "Estudiante":
                 profile_entity = Estudiante(
                     id_p=0,
@@ -146,11 +158,12 @@ class AutenticacionService(AutenticacionServiceABC):
                     return None
                 profile_id = profile_entity.id_p
 
-            case "Empresa":
+            case "Empresa" | "Empresario":
                 profile_entity = Empresa(
                     id_e=0,
                     nombre_empresa=datos_perfil.get("nombre_empresa", ""),
                     estado_de_convenio_emp=datos_perfil.get("estado_de_convenio_emp", "Vigente"),
+                    correo_electronico=username_correo,
                 )
                 if not self.empresa_repo.guardar(profile_entity):
                     return None
@@ -159,12 +172,11 @@ class AutenticacionService(AutenticacionServiceABC):
             case _:
                 return None
 
-        # Guardar la entidad Usuario vinculando el profile_id
         usuario = Usuario(
             id_u=0,
             username_correo=username_correo,
             contrasena=contrasena,
-            rol=rol,
+            rol=rol_str,
             id_p=profile_id,
         )
         if not self.usuario_repo.guardar(usuario):
@@ -172,13 +184,15 @@ class AutenticacionService(AutenticacionServiceABC):
 
         return profile_entity
 
-def eliminar_cuenta_usuario_sistema(self, username_correo: str) -> bool:
+    def eliminar_cuenta_usuario_sistema(self, username_correo: str) -> bool:
         user = self.usuario_repo.buscar_por_username(username_correo)
         if not user:
             return False
 
+        rol_str = user.rol.value if hasattr(user.rol, "value") else user.rol
         eliminado_perfil = False
-        match user.rol:
+
+        match rol_str:
             case "Estudiante":
                 eliminado_perfil = self.estudiante_repo.eliminar(user.id_p)
             case "Coordinador":
@@ -189,7 +203,7 @@ def eliminar_cuenta_usuario_sistema(self, username_correo: str) -> bool:
                 eliminado_perfil = self.tutor_emp_repo.eliminar(user.id_p)
             case "Administrador":
                 eliminado_perfil = self.administrador_repo.eliminar(user.id_p)
-            case "Empresa":
+            case "Empresa" | "Empresario":
                 eliminado_perfil = self.empresa_repo.eliminar(user.id_p)
             case _:
                 return False

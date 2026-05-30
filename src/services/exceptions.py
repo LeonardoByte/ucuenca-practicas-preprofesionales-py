@@ -1,19 +1,38 @@
-
-class DomainException(Exception):
+class DomainError(Exception):
     """Clase base para excepciones del dominio de negocio."""
     pass
 
 
-class EstudianteConPracticaActivaError(DomainException):
+class EstudianteConPracticaActivaError(DomainError):
     """El estudiante ya posee una práctica activa o en curso."""
     pass
 
 
-class CicloNoPermitidoError(DomainException):
+class CicloNoPermitidoError(DomainError):
     """El estudiante no cumple con el umbral mínimo del ciclo académico."""
     pass
 
 
-class TernaInvalidaError(DomainException):
-    """La terna no cumple con las condiciones (ej. no son exactamente 3 postulaciones válidas para la misma oferta)."""
+class TernaInvalidaError(DomainError):
+    """La terna no cumple con las condiciones de homogeneidad o tamaño."""
+    pass
+
+
+class CredencialesInvalidasError(DomainError):
+    """El usuario no existe o la contraseña ingresada es incorrecta."""
+    pass
+
+
+class CorreoDuplicadoError(DomainError):
+    """El correo electrónico ya se encuentra registrado en el sistema."""
+    pass
+
+
+class RequisitosNoCumplidosError(DomainError):
+    """El estudiante no cumple los requisitos académicos (matrícula o ciclo)."""
+    pass
+
+
+class DocumentacionIncompletaError(DomainError):
+    """Faltan firmas o formularios obligatorios para completar la práctica."""
     pass
