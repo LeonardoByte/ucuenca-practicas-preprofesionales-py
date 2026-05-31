@@ -1,7 +1,14 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from src.models import Actividad, Oferta, Postulacion, SolicitudAutorizacion, SolicitudOficio
+from src.models import (
+    Actividad,
+    Oferta,
+    Postulacion,
+    Practica,
+    SolicitudAutorizacion,
+    SolicitudOficio,
+)
 
 
 class EstudianteMainServiceABC(ABC):
@@ -66,3 +73,14 @@ class EstudianteMainServiceABC(ABC):
     ) -> Optional[Actividad]:
         """Delega en PracticaService la inserción de una nueva tarea en la bitácora del alumno."""
         pass
+
+    @abstractmethod
+    def obtener_practica_activa_estudiante(self, id_p_estudiante: int) -> Optional[Practica]:
+        """Retorna la práctica activa del estudiante (INICIADA o EN_EVALUACION)."""
+        pass
+
+    @abstractmethod
+    def obtener_mis_postulaciones(self, id_p_estudiante: int) -> list[Postulacion]:
+        """Filtra y devuelve el historial de postulaciones del estudiante."""
+        pass
+

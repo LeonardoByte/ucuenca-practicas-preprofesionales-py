@@ -1,2 +1,0 @@
-class EmpresaController:
-    pass

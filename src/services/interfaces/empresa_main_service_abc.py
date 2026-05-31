@@ -1,7 +1,13 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from src.models import Oferta, Postulacion
+from src.models import (
+    Convenio,
+    Oferta,
+    Postulacion,
+    Practica,
+    TutorEmpresarial,
+)
 
 
 class EmpresaMainServiceABC(ABC):
@@ -44,4 +50,41 @@ class EmpresaMainServiceABC(ABC):
         """Usa OfertaService para jalar el catálogo completo filtrando funcionalmente
         por el ID de esta empresa.
         """
+        pass
+
+    @abstractmethod
+    def crear_convenio_empresa(
+        self, id_e: int, fecha_firma: str, fecha_vencimiento: str
+    ) -> Optional[Convenio]:
+        """Registra un nuevo convenio para la empresa."""
+        pass
+
+    @abstractmethod
+    def obtener_convenios_empresa(self, id_e: int) -> list[Convenio]:
+        """Obtiene todos los convenios registrados por la empresa."""
+        pass
+
+    @abstractmethod
+    def obtener_tutores_de_empresa(self, id_e: int) -> list[TutorEmpresarial]:
+        """Lista la planilla de personal empresarial disponible para tutorías."""
+        pass
+
+    @abstractmethod
+    def obtener_ofertas_activas_empresa(self, id_e: int) -> list[Oferta]:
+        """Lista las ofertas de la empresa que no están vinculadas a prácticas en curso."""
+        pass
+
+    @abstractmethod
+    def obtener_historial_ofertas_empresa(self, id_e: int) -> list[Oferta]:
+        """Lista las ofertas históricas de la empresa vinculadas a prácticas."""
+        pass
+
+    @abstractmethod
+    def obtener_practicas_activas_empresa(self, id_e: int) -> list[Practica]:
+        """Lista las prácticas activas asociadas a la empresa."""
+        pass
+
+    @abstractmethod
+    def obtener_historial_practicas_empresa(self, id_e: int) -> list[Practica]:
+        """Lista el historial de prácticas culminadas de la empresa."""
         pass

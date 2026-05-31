@@ -18,3 +18,15 @@ class AdministradorMainService(AdministradorMainServiceABC):
 
     def eliminar_usuario_sistema(self, username_correo: str) -> bool:
         return self.autenticacion_service.eliminar_cuenta_usuario_sistema(username_correo)
+
+    def obtener_todos_los_usuarios_sistema(self) -> list[dict]:
+        usuarios = self.autenticacion_service.usuario_repo.obtener_todos()
+        return [
+            {
+                "username_correo": u.username_correo,
+                "rol": u.rol,
+                "id_p": u.id_p,
+            }
+            for u in usuarios
+        ]
+

@@ -1,6 +1,12 @@
 from abc import ABC, abstractmethod
+from typing import Optional
 
-from src.models import Postulacion, SolicitudAutorizacion, SolicitudOficio
+from src.models import (
+    Postulacion,
+    Practica,
+    SolicitudAutorizacion,
+    SolicitudOficio,
+)
 
 
 class CoordinadorMainServiceABC(ABC):
@@ -46,4 +52,43 @@ class CoordinadorMainServiceABC(ABC):
     @abstractmethod
     def listar_solicitudes_oficio_pendientes(self) -> list[SolicitudOficio]:
         """Listar las solicitudes globales pendientes de oficio."""
+        pass
+
+    @abstractmethod
+    def listar_ofertas_con_conteo_validadas(self) -> list[dict]:
+        """
+        Retorna datos de ofertas con conteo de postulaciones en estado VALIDADA.
+        """
+        pass
+
+    @abstractmethod
+    def evaluar_solicitud_autorizacion(
+        self,
+        id_sol_aut: int,
+        aprobado: bool,
+        id_p_coordinador: int,
+        nombre_destinatario: Optional[str] = None,
+        cargo_destinatario: Optional[str] = None,
+    ) -> bool:
+        """
+        Muta el estado de una solicitud de empresa propia. Si se aprueba, genera
+        una SolicitudOficio en estado PENDIENTE.
+        """
+        pass
+
+    @abstractmethod
+    def procesar_emision_oficio(
+        self, id_sol_of: int, id_p_coordinador: int, ruta_oficio_pdf: str
+    ) -> bool:
+        """
+        Muta el estado de una solicitud de oficio a EMITIDO y vincula firma del coordinador.
+        """
+        pass
+
+    @abstractmethod
+    def listar_practicas_pendientes_de_tutor(self, id_p_coordinador: int) -> list[Practica]:
+        """
+        Retorna prácticas en estado INICIADA sin tutor académico, cuyas postulaciones origen
+        fueron auditadas por este coordinador.
+        """
         pass

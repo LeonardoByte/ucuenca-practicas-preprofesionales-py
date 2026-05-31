@@ -34,6 +34,8 @@ from src.models import (
     EstadoPostulacion,
     EstadoPractica,
     EstadoPracticaEstudiante,
+    EstadoSolicitudAutorizacion,
+    EstadoSolicitudOficio,
     EstadoValidacionActividad,
     Estudiante,
     Postulacion,
@@ -42,10 +44,6 @@ from src.models import (
     TipoFormulario,
     TutorAcademico,
     TutorEmpresarial,
-    SolicitudAutorizacion,
-    SolicitudOficio,
-    EstadoSolicitudAutorizacion,
-    EstadoSolicitudOficio,
 )
 from src.services.administrador_main_service import AdministradorMainService
 
@@ -587,23 +585,47 @@ def test_tutor_academico_evaluar_actividad_alumno():
 def test_tutor_academico_registrar_evaluacion_formulario2():
     tutor_service = TutorAcademicoMainService()
     practica_service = PracticaService()
+    inicializar_todos_los_dat_semilla()
 
+    # Guardar práctica que vence el 2026-06-30
+    practica_service.practica_repo.guardar(
+        Practica(id_pr=1, id_pos=1, id_p_tutor_acad=10, id_p_tutor_emp=1, fecha_inicio="2026-06-01", fecha_fin="2026-06-30", estado_de_practica=EstadoPractica.INICIADA)
+    )
+
+    # Registro exitoso (dentro de los 7 días)
     assert tutor_service.registrar_evaluacion_formulario2(1, EstadoFirmaFormulario.COMPLETADO, "2026-06-25") is True
     forms = practica_service.formulario_repo.listar_formularios_por_practica(1)
     f2 = [f for f in forms if f.tipo_formulario == TipoFormulario.FORMULARIO_2][0]
     assert f2.estado_de_firma == EstadoFirmaFormulario.COMPLETADO
     assert f2.fecha_de_entrega_registro == "2026-06-25"
 
+    # Registro fallido por evaluación temprana
+    from src.services.exceptions import EvaluacionTempranaError
+    with pytest.raises(EvaluacionTempranaError):
+        tutor_service.registrar_evaluacion_formulario2(1, EstadoFirmaFormulario.COMPLETADO, "2026-06-20")
+
 
 def test_tutor_empresarial_registrar_evaluacion_formulario3():
     tutor_emp_service = TutorEmpresarialMainService()
     practica_service = PracticaService()
+    inicializar_todos_los_dat_semilla()
 
+    # Guardar práctica que vence el 2026-06-30
+    practica_service.practica_repo.guardar(
+        Practica(id_pr=1, id_pos=1, id_p_tutor_acad=10, id_p_tutor_emp=1, fecha_inicio="2026-06-01", fecha_fin="2026-06-30", estado_de_practica=EstadoPractica.INICIADA)
+    )
+
+    # Registro exitoso (dentro de los 7 días)
     assert tutor_emp_service.registrar_evaluacion_formulario3(1, EstadoFirmaFormulario.COMPLETADO, "2026-06-26") is True
     forms = practica_service.formulario_repo.listar_formularios_por_practica(1)
     f3 = [f for f in forms if f.tipo_formulario == TipoFormulario.FORMULARIO_3][0]
     assert f3.estado_de_firma == EstadoFirmaFormulario.COMPLETADO
     assert f3.fecha_de_entrega_registro == "2026-06-26"
+
+    # Registro fallido por evaluación temprana
+    from src.services.exceptions import EvaluacionTempranaError
+    with pytest.raises(EvaluacionTempranaError):
+        tutor_emp_service.registrar_evaluacion_formulario3(1, EstadoFirmaFormulario.COMPLETADO, "2026-06-20")
 
 
 # ==========================================

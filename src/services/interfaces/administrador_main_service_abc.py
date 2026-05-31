@@ -26,3 +26,13 @@ class AdministradorMainServiceABC(ABC):
         Retorna True si la eliminación fue exitosa, False en caso contrario.
         """
         pass
+
+    @abstractmethod
+    def obtener_todos_los_usuarios_sistema(self) -> list[dict]:
+        """
+        Retorna todos los usuarios registrados en el sistema, formateados
+        como un diccionario con el correo, rol e ID de persona.
+        Excluye la contraseña por seguridad.
+        """
+        pass
+

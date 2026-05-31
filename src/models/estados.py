@@ -25,9 +25,9 @@ class TipoFormulario(str, Enum):
 
 class EstadoPostulacion(str, Enum):
     PENDIENTE = "Pendiente"
-    VALIDADA = "Validada"
-    ACEPTADA = "Aceptada"
-    RECHAZADA = "Rechazada"
+    VALIDADA = "Validada" # Cuando el coordinador valida
+    ACEPTADA = "Aceptada" # Cuando la empresa acepta
+    RECHAZADA = "Rechazada" # Cuando el coordinador o la empresa rechaza
 
 
 class EstadoPractica(str, Enum):

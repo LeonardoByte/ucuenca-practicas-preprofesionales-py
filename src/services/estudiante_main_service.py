@@ -3,11 +3,13 @@ from typing import Optional
 from src.models import (
     Actividad,
     EstadoMatricula,
+    EstadoPractica,
     EstadoPracticaEstudiante,
     EstadoSolicitudAutorizacion,
     EstadoSolicitudOficio,
     Oferta,
     Postulacion,
+    Practica,
     SolicitudAutorizacion,
     SolicitudOficio,
 )
@@ -139,4 +141,28 @@ class EstudianteMainService(EstudianteMainServiceABC):
         self, id_pr: int, descripcion_de_la_tarea: str
     ) -> Optional[Actividad]:
         return self.practica_service.registrar_actividad(id_pr, descripcion_de_la_tarea)
+
+    def obtener_practica_activa_estudiante(self, id_p_estudiante: int) -> Optional[Practica]:
+        self.postulacion_service.postulacion_repo._cargar_datos()
+        self.practica_service.practica_repo._cargar_datos()
+
+        student_post_ids = {
+            p.id_pos for p in self.postulacion_service.postulacion_repo._datos
+            if p.id_p_estudiante == id_p_estudiante
+        }
+
+        matching_practices = [
+            pr for pr in self.practica_service.practica_repo._datos
+            if pr.id_pos in student_post_ids
+            and pr.estado_de_practica in {EstadoPractica.INICIADA, EstadoPractica.EN_EVALUACION}
+        ]
+        return matching_practices[0] if matching_practices else None
+
+    def obtener_mis_postulaciones(self, id_p_estudiante: int) -> list[Postulacion]:
+        self.postulacion_service.postulacion_repo._cargar_datos()
+        return [
+            p for p in self.postulacion_service.postulacion_repo._datos
+            if p.id_p_estudiante == id_p_estudiante
+        ]
+
 

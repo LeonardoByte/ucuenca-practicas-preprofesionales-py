@@ -36,3 +36,9 @@ class RequisitosNoCumplidosError(DomainError):
 class DocumentacionIncompletaError(DomainError):
     """Faltan firmas o formularios obligatorios para completar la práctica."""
     pass
+
+
+class EvaluacionTempranaError(DomainError):
+    """La evaluación final se registra antes del plazo permitido (7 días)."""
+    pass
+
