@@ -1,4 +1,8 @@
+import re
+
+from PyQt6 import uic
 from PyQt6.QtCore import QObject, pyqtSignal
+from PyQt6.QtWidgets import QMessageBox
 
 from src.models.estados import RolUsuario
 from src.services.exceptions import CredencialesInvalidasError
@@ -12,28 +16,50 @@ class LoginController(QObject):
         super().__init__()
         self.view = view
         self.service = service
-        self.view.btn_login.clicked.connect(self.procesar_login)
+
+        # Load the dynamic UI
+        uic.loadUi("src/views/ui/frm_login.ui", self.view)
+
+        # Connect signals
+        self.view.btnIngresar.clicked.connect(self.procesar_login)
 
     def procesar_login(self) -> None:
-        correo = self.view.txt_correo.text().strip()
-        contrasena = self.view.txt_contrasena.text().strip()
+        correo = self.view.txtCorreo.text().strip()
+        contrasena = self.view.txtContrasena.text().strip()
 
-        if not correo or not contrasena:
-            self.view.mostrar_error("Por favor, complete todos los campos.")
+        if not correo:
+            QMessageBox.critical(
+                self.view, "Error de Validación", "Debe ingresar el correo electrónico."
+            )
+            return
+
+
+        if not contrasena:
+            QMessageBox.critical(self.view, "Error de Validación", "Debe ingresar la contraseña.")
+            return
+
+        # Validate email format
+        patron = r"^[^@\s]+@[^@\s]+\.[^@\s]+$"
+        if not re.match(patron, correo):
+            QMessageBox.critical(
+                self.view,
+                "Error de Validación",
+                "El correo electrónico no tiene un formato válido."
+            )
             return
 
         try:
             profile, rol = self.service.ejecutar_ingreso(correo, contrasena)
             if profile is None or not rol:
-                self.view.mostrar_error("Credenciales incorrectas.")
+                QMessageBox.critical(self.view, "Error de Acceso", "Credenciales incorrectas.")
                 return
 
-            # Cast role if it is a string representation, or keep enum
             if isinstance(rol, str):
                 rol = RolUsuario(rol)
 
             self.login_exitoso.emit(profile, rol)
         except CredencialesInvalidasError as e:
-            self.view.mostrar_error(str(e))
+            QMessageBox.critical(self.view, "Error de Acceso", str(e))
         except Exception as e:
-            self.view.mostrar_error(f"Error inesperado: {str(e)}")
+            QMessageBox.critical(self.view, "Error Inesperado", f"Error inesperado: {str(e)}")
+

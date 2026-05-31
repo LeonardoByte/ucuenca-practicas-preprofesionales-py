@@ -1,7 +1,8 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, patch, ANY
+import unittest
 
 import pytest
-from PyQt6.QtWidgets import QApplication
+from PyQt6.QtWidgets import QApplication, QMessageBox
 
 from src.controllers import (
     AdministradorController,
@@ -17,6 +18,8 @@ from src.models.estados import (
     EstadoFirmaFormulario,
     EstadoValidacionActividad,
     RolUsuario,
+    EstadoMatricula,
+    EstadoConvenio,
 )
 from src.services.exceptions import (
     CredencialesInvalidasError,
@@ -34,12 +37,81 @@ def qapp():
     return app
 
 
+def configure_mock_admin_view(mock_view):
+    # Setup all required widgets on mock_view as MagicMock
+    mock_view.tableWidget = MagicMock()
+    mock_view.tableWidget.rowCount.return_value = 0
+    mock_view.btnNavIngresarUsuario = MagicMock()
+    mock_view.btnNavEliminarUsuario = MagicMock()
+    mock_view.btnNavCerrarSesion = MagicMock()
+    mock_view.actRegistrarUsuario = MagicMock()
+    mock_view.actAuditoriaUsuarios = MagicMock()
+    mock_view.actCerrarSesion = MagicMock()
+    mock_view.actSalirSistema = MagicMock()
+    mock_view.actAcercaPrograma = MagicMock()
+    mock_view.actAcercaDesarrollador = MagicMock()
+    mock_view.actRepositorioGithub = MagicMock()
+    mock_view.btnCrearUsuario = MagicMock()
+    mock_view.btnEliminarUsuario = MagicMock()
+    mock_view.cmbTipoUsuario = MagicMock()
+    mock_view.txtBusquedaCorreo = MagicMock()
+    mock_view.txtBusquedaCorreo.text.return_value = ""
+    mock_view.stackedWidgetCentral = MagicMock()
+    mock_view.stackedWidgetFormularios = MagicMock()
+    mock_view.cmbTutorEmpEmpresa = MagicMock()
+    mock_view.cmbTutorEmpEmpresa.count.return_value = 0
+    
+    # Estudiante inputs
+    mock_view.txtEstudianteNombre = MagicMock()
+    mock_view.txtEstudianteNombre.text.return_value = ""
+    mock_view.txtEstudianteCedula = MagicMock()
+    mock_view.txtEstudianteCedula.text.return_value = ""
+    mock_view.txtEstudianteCorreo = MagicMock()
+    mock_view.txtEstudianteCorreo.text.return_value = ""
+    mock_view.txtEstudianteDireccion = MagicMock()
+    mock_view.txtEstudianteDireccion.text.return_value = ""
+    mock_view.sbxEstudianteCiclo = MagicMock()
+    mock_view.sbxEstudianteCiclo.value.return_value = 1
+    mock_view.comboBox = MagicMock()
+    
+    # Personal inputs
+    mock_view.txtPersonalNombre = MagicMock()
+    mock_view.txtPersonalNombre.text.return_value = ""
+    mock_view.txtPersonalCedula = MagicMock()
+    mock_view.txtPersonalCedula.text.return_value = ""
+    mock_view.txtPersonalCorreo = MagicMock()
+    mock_view.txtPersonalCorreo.text.return_value = ""
+    mock_view.txtPersonalDireccion = MagicMock()
+    mock_view.txtPersonalDireccion.text.return_value = ""
+    
+    # Tutor Empresarial inputs
+    mock_view.txtTutorEmpNombre = MagicMock()
+    mock_view.txtTutorEmpNombre.text.return_value = ""
+    mock_view.txtTutorEmpCedula = MagicMock()
+    mock_view.txtTutorEmpCedula.text.return_value = ""
+    mock_view.txtTutorEmpCorreo = MagicMock()
+    mock_view.txtTutorEmpCorreo.text.return_value = ""
+    mock_view.txtTutorEmpDireccion = MagicMock()
+    mock_view.txtTutorEmpDireccion.text.return_value = ""
+    
+    # Empresa inputs
+    mock_view.txtEmpresaNombre = MagicMock()
+    mock_view.txtEmpresaNombre.text.return_value = ""
+    mock_view.txtEmpresaCorreo = MagicMock()
+    mock_view.txtEmpresaCorreo.text.return_value = ""
+    mock_view.comboBox_2 = MagicMock()
+
+
+
 # ==========================================
 # 1. Tests para LoginController
 # ==========================================
 
 def test_login_controller_exitoso(qapp):
     mock_view = MagicMock()
+    mock_view.txtCorreo = mock_view.txt_correo
+    mock_view.txtContrasena = mock_view.txt_contrasena
+    mock_view.btnIngresar = mock_view.btn_login
     mock_view.txt_correo.text.return_value = "user@unl.edu.ec "
     mock_view.txt_contrasena.text.return_value = " secretpass "
 
@@ -47,10 +119,11 @@ def test_login_controller_exitoso(qapp):
     dummy_profile = MagicMock()
     mock_service.ejecutar_ingreso.return_value = (dummy_profile, RolUsuario.ADMINISTRADOR)
 
-    controller = LoginController(mock_view, mock_service)
+    with patch("src.controllers.login_controller.uic.loadUi"):
+        controller = LoginController(mock_view, mock_service)
 
     # Grab callback from clicked connection
-    callback = mock_view.btn_login.clicked.connect.call_args[0][0]
+    callback = mock_view.btnIngresar.clicked.connect.call_args[0][0]
 
     # Connect a spy to the signal
     spy = MagicMock()
@@ -62,56 +135,69 @@ def test_login_controller_exitoso(qapp):
     # Asserts
     mock_service.ejecutar_ingreso.assert_called_once_with("user@unl.edu.ec", "secretpass")
     spy.assert_called_once_with(dummy_profile, RolUsuario.ADMINISTRADOR)
-    mock_view.mostrar_error.assert_not_called()
-
 
 
 def test_login_controller_campos_vacios(qapp):
     mock_view = MagicMock()
+    mock_view.txtCorreo = mock_view.txt_correo
+    mock_view.txtContrasena = mock_view.txt_contrasena
+    mock_view.btnIngresar = mock_view.btn_login
     mock_view.txt_correo.text.return_value = "   "
     mock_view.txt_contrasena.text.return_value = "password"
 
     mock_service = MagicMock()
-    controller = LoginController(mock_view, mock_service)
+    with patch("src.controllers.login_controller.uic.loadUi"), \
+         patch("src.controllers.login_controller.QMessageBox.critical") as mock_critical:
+        controller = LoginController(mock_view, mock_service)
 
-    callback = mock_view.btn_login.clicked.connect.call_args[0][0]
-    callback()
+        callback = mock_view.btnIngresar.clicked.connect.call_args[0][0]
+        callback()
 
     mock_service.ejecutar_ingreso.assert_not_called()
-    mock_view.mostrar_error.assert_called_once_with("Por favor, complete todos los campos.")
+    mock_critical.assert_called_once_with(mock_view, "Error de Validación", "Debe ingresar el correo electrónico.")
 
 
 def test_login_controller_credenciales_incorrectas(qapp):
     mock_view = MagicMock()
+    mock_view.txtCorreo = mock_view.txt_correo
+    mock_view.txtContrasena = mock_view.txt_contrasena
+    mock_view.btnIngresar = mock_view.btn_login
     mock_view.txt_correo.text.return_value = "wrong@unl.edu.ec"
     mock_view.txt_contrasena.text.return_value = "wrongpass"
 
     mock_service = MagicMock()
     mock_service.ejecutar_ingreso.return_value = (None, "")
 
-    controller = LoginController(mock_view, mock_service)
+    with patch("src.controllers.login_controller.uic.loadUi"), \
+         patch("src.controllers.login_controller.QMessageBox.critical") as mock_critical:
+        controller = LoginController(mock_view, mock_service)
 
-    callback = mock_view.btn_login.clicked.connect.call_args[0][0]
-    callback()
+        callback = mock_view.btnIngresar.clicked.connect.call_args[0][0]
+        callback()
 
     mock_service.ejecutar_ingreso.assert_called_once_with("wrong@unl.edu.ec", "wrongpass")
-    mock_view.mostrar_error.assert_called_once_with("Credenciales incorrectas.")
+    mock_critical.assert_called_once_with(mock_view, "Error de Acceso", "Credenciales incorrectas.")
 
 
 def test_login_controller_excepcion(qapp):
     mock_view = MagicMock()
+    mock_view.txtCorreo = mock_view.txt_correo
+    mock_view.txtContrasena = mock_view.txt_contrasena
+    mock_view.btnIngresar = mock_view.btn_login
     mock_view.txt_correo.text.return_value = "user@unl.edu.ec"
     mock_view.txt_contrasena.text.return_value = "pass"
 
     mock_service = MagicMock()
     mock_service.ejecutar_ingreso.side_effect = CredencialesInvalidasError("Derrumbe de aduana")
 
-    controller = LoginController(mock_view, mock_service)
+    with patch("src.controllers.login_controller.uic.loadUi"), \
+         patch("src.controllers.login_controller.QMessageBox.critical") as mock_critical:
+        controller = LoginController(mock_view, mock_service)
 
-    callback = mock_view.btn_login.clicked.connect.call_args[0][0]
-    callback()
+        callback = mock_view.btnIngresar.clicked.connect.call_args[0][0]
+        callback()
 
-    mock_view.mostrar_error.assert_called_once_with("Derrumbe de aduana")
+    mock_critical.assert_called_once_with(mock_view, "Error de Acceso", "Derrumbe de aduana")
 
 
 # ==========================================
@@ -120,96 +206,125 @@ def test_login_controller_excepcion(qapp):
 
 def test_administrador_controller_inicializacion(qapp):
     mock_view = MagicMock()
+    configure_mock_admin_view(mock_view)
     mock_service = MagicMock()
     usuarios_dummy = [{"username_correo": "adm@test.com", "rol": RolUsuario.ADMINISTRADOR, "id_p": 1}]
     mock_service.obtener_todos_los_usuarios_sistema.return_value = usuarios_dummy
 
-    controller = AdministradorController(mock_view, mock_service)
+    with patch("src.controllers.administrador_controller.uic.loadUi"):
+        controller = AdministradorController(mock_view, mock_service)
 
     mock_service.obtener_todos_los_usuarios_sistema.assert_called_once()
-    mock_view.mostrar_usuarios.assert_called_once_with(usuarios_dummy)
+    mock_view.tableWidget.setRowCount.assert_called_once_with(0)
+    mock_view.tableWidget.insertRow.assert_called_once_with(0)
+    mock_view.tableWidget.setItem.assert_any_call(0, 0, ANY)
 
 
 def test_administrador_controller_crear_usuario_exito(qapp):
     mock_view = MagicMock()
-    mock_view.txt_crear_correo.text.return_value = "new@unl.edu.ec"
-    mock_view.txt_crear_contrasena.text.return_value = "pass123"
-    mock_view.txt_crear_nombre.text.return_value = "Juan Pérez"
-    mock_view.txt_crear_cedula.text.return_value = "1102938475"
-    mock_view.txt_crear_direccion.text.return_value = "Loja"
-    mock_view.cmb_crear_rol.currentData.return_value = RolUsuario.ESTUDIANTE
+    configure_mock_admin_view(mock_view)
+    mock_view.cmbTipoUsuario.currentIndex.return_value = 0
+    mock_view.txtEstudianteCorreo.text.return_value = "new@unl.edu.ec"
+    mock_view.txtEstudianteNombre.text.return_value = "Juan Pérez"
+    mock_view.txtEstudianteCedula.text.return_value = "1102938475"
+    mock_view.txtEstudianteDireccion.text.return_value = "Loja"
+    mock_view.sbxEstudianteCiclo.value.return_value = 5
+    mock_view.comboBox.currentText.return_value = "Matriculado"
 
     mock_service = MagicMock()
     mock_service.crear_cuenta_usuario_sistema.return_value = MagicMock()
 
-    controller = AdministradorController(mock_view, mock_service)
+    with patch("src.controllers.administrador_controller.uic.loadUi"), \
+         patch("src.controllers.administrador_controller.QMessageBox.information") as mock_info:
+        controller = AdministradorController(mock_view, mock_service)
 
-    callback = mock_view.btn_crear_usuario.clicked.connect.call_args[0][0]
-    callback()
+        callback = mock_view.btnCrearUsuario.clicked.connect.call_args[0][0]
+        callback()
 
     mock_service.crear_cuenta_usuario_sistema.assert_called_once_with(
         "new@unl.edu.ec",
-        "pass123",
+        "password",
         RolUsuario.ESTUDIANTE,
         {
             "nombre_y_apellido": "Juan Pérez",
             "cedula_dni": "1102938475",
             "direccion": "Loja",
-            "nombre_empresa": "Juan Pérez",
+            "ciclo_actual": 5,
+            "estado_de_matricula": EstadoMatricula.MATRICULADO,
         }
     )
-    mock_view.mostrar_exito.assert_called_once_with("Usuario registrado exitosamente.")
-    mock_view.limpiar_formulario_creacion.assert_called_once()
-    mock_view.mostrar_seccion.assert_called_with("ver_usuarios")
+    mock_info.assert_called_once_with(mock_view, "Registro exitoso", "La información fue guardada correctamente.")
+    mock_view.txtEstudianteNombre.clear.assert_called_once()
 
 
 def test_administrador_controller_crear_usuario_campos_vacios(qapp):
     mock_view = MagicMock()
-    mock_view.txt_crear_correo.text.return_value = ""
-    mock_view.txt_crear_contrasena.text.return_value = ""
-    mock_view.txt_crear_nombre.text.return_value = ""
+    configure_mock_admin_view(mock_view)
+    mock_view.cmbTipoUsuario.currentIndex.return_value = 0
+    mock_view.txtEstudianteCorreo.text.return_value = ""
+    mock_view.txtEstudianteNombre.text.return_value = ""
+    mock_view.txtEstudianteCedula.text.return_value = ""
 
     mock_service = MagicMock()
-    controller = AdministradorController(mock_view, mock_service)
+    with patch("src.controllers.administrador_controller.uic.loadUi"), \
+         patch("src.controllers.administrador_controller.QMessageBox.critical") as mock_critical:
+        controller = AdministradorController(mock_view, mock_service)
 
-    callback = mock_view.btn_crear_usuario.clicked.connect.call_args[0][0]
-    callback()
+        callback = mock_view.btnCrearUsuario.clicked.connect.call_args[0][0]
+        callback()
 
     mock_service.crear_cuenta_usuario_sistema.assert_not_called()
-    mock_view.mostrar_error.assert_called_once()
+    mock_critical.assert_called_once()
 
 
 def test_administrador_controller_eliminar_usuario_confirmado(qapp):
     mock_view = MagicMock()
-    mock_view.obtener_usuario_seleccionado.return_value = "delete@unl.edu.ec"
-    mock_view.confirmar_accion.return_value = True
+    configure_mock_admin_view(mock_view)
+    mock_item = MagicMock()
+    mock_item.row.return_value = 0
+    mock_view.tableWidget.selectedItems.return_value = [mock_item]
+    mock_correo_item = MagicMock()
+    mock_correo_item.text.return_value = "delete@unl.edu.ec"
+    mock_view.tableWidget.item.return_value = mock_correo_item
 
     mock_service = MagicMock()
     mock_service.eliminar_usuario_sistema.return_value = True
 
-    controller = AdministradorController(mock_view, mock_service)
+    with patch("src.controllers.administrador_controller.uic.loadUi"), \
+         patch("src.controllers.administrador_controller.QMessageBox.question", return_value=QMessageBox.StandardButton.Yes), \
+         patch("src.controllers.administrador_controller.QMessageBox.information") as mock_info:
+        controller = AdministradorController(mock_view, mock_service)
 
-    callback = mock_view.btn_eliminar_usuario.clicked.connect.call_args[0][0]
-    callback()
+        callback = mock_view.btnEliminarUsuario.clicked.connect.call_args[0][0]
+        callback()
 
-    mock_view.confirmar_accion.assert_called_once()
     mock_service.eliminar_usuario_sistema.assert_called_once_with("delete@unl.edu.ec")
-    mock_view.mostrar_exito.assert_called_once()
+    mock_info.assert_called_once_with(mock_view, "Baja exitosa", "El usuario fue eliminado correctamente.")
 
 
 def test_administrador_controller_eliminar_usuario_cancelado(qapp):
     mock_view = MagicMock()
-    mock_view.obtener_usuario_seleccionado.return_value = "keep@unl.edu.ec"
-    mock_view.confirmar_accion.return_value = False
+    configure_mock_admin_view(mock_view)
+    mock_item = MagicMock()
+    mock_item.row.return_value = 0
+    mock_view.tableWidget.selectedItems.return_value = [mock_item]
+    mock_correo_item = MagicMock()
+    mock_correo_item.text.return_value = "keep@unl.edu.ec"
+    mock_view.tableWidget.item.return_value = mock_correo_item
 
     mock_service = MagicMock()
-    controller = AdministradorController(mock_view, mock_service)
 
-    callback = mock_view.btn_eliminar_usuario.clicked.connect.call_args[0][0]
-    callback()
+    with patch("src.controllers.administrador_controller.uic.loadUi"), \
+         patch("src.controllers.administrador_controller.QMessageBox.question", return_value=QMessageBox.StandardButton.No), \
+         patch("src.controllers.administrador_controller.QMessageBox.information") as mock_info:
+        controller = AdministradorController(mock_view, mock_service)
+
+        callback = mock_view.btnEliminarUsuario.clicked.connect.call_args[0][0]
+        callback()
 
     mock_service.eliminar_usuario_sistema.assert_not_called()
-    mock_view.mostrar_exito.assert_not_called()
+    mock_info.assert_not_called()
+
 
 
 # ==========================================
@@ -608,6 +723,12 @@ def test_router_transiciones(qapp):
     mock_login_view = MagicMock()
     mock_admin_view = MagicMock()
 
+    mock_login_view.btnIngresar = mock_login_view.btn_login
+    mock_login_view.txtCorreo = mock_login_view.txt_correo
+    mock_login_view.txtContrasena = mock_login_view.txt_contrasena
+    
+    configure_mock_admin_view(mock_admin_view)
+
     view_factories = {
         "LoginWindow": lambda: mock_login_view,
         RolUsuario.ADMINISTRADOR: lambda: mock_admin_view,
@@ -618,31 +739,34 @@ def test_router_transiciones(qapp):
         "administrador_service": MagicMock(),
     }
 
-    router = Router(mock_services, view_factories)
+    with patch("src.controllers.login_controller.uic.loadUi"), \
+         patch("src.controllers.administrador_controller.uic.loadUi"):
+        router = Router(mock_services, view_factories)
 
-    # 1. Start router -> loads login
-    router.start()
+        # 1. Start router -> loads login
+        router.start()
 
-    assert router.current_view == mock_login_view
-    assert isinstance(router.current_controller, LoginController)
-    mock_login_view.show.assert_called_once()
+        assert router.current_view == mock_login_view
+        assert isinstance(router.current_controller, LoginController)
+        mock_login_view.show.assert_called_once()
 
-    # 2. Trigger login exitoso -> routes to ADMIN role window
-    admin_profile = MagicMock()
+        # 2. Trigger login exitoso -> routes to ADMIN role window
+        admin_profile = MagicMock()
 
-    # Simulate signal emission
-    router.current_controller.login_exitoso.emit(admin_profile, RolUsuario.ADMINISTRADOR)
+        # Simulate signal emission
+        router.current_controller.login_exitoso.emit(admin_profile, RolUsuario.ADMINISTRADOR)
 
-    # Verify login view closed and cleaned
-    mock_login_view.close.assert_called_once()
+        # Verify login view closed and cleaned
+        mock_login_view.close.assert_called_once()
 
-    assert router.current_view == mock_admin_view
-    assert isinstance(router.current_controller, AdministradorController)
-    mock_admin_view.show.assert_called_once()
+        assert router.current_view == mock_admin_view
+        assert isinstance(router.current_controller, AdministradorController)
+        mock_admin_view.show.assert_called_once()
 
-    # 3. Trigger cerrar_sesion from admin controller -> returns to login view
-    router.current_controller.cerrar_sesion.emit()
+        # 3. Trigger cerrar_sesion from admin controller -> returns to login view
+        router.current_controller.cerrar_sesion.emit()
 
-    mock_admin_view.close.assert_called_once()
-    assert router.current_view == mock_login_view
-    assert isinstance(router.current_controller, LoginController)
+        mock_admin_view.close.assert_called_once()
+        assert router.current_view == mock_login_view
+        assert isinstance(router.current_controller, LoginController)
+
