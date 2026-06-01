@@ -84,18 +84,26 @@ def module_redirect_paths():
 
 @pytest.fixture(autouse=True)
 def clean_test_db():
+    import gc
+    import time
+    gc.collect()
     test_db_dir = pathlib.Path("storage/test_db")
     if test_db_dir.exists():
-        try:
-            shutil.rmtree(test_db_dir)
-        except Exception:
-            pass
+        for _ in range(5):
+            try:
+                shutil.rmtree(test_db_dir)
+                break
+            except Exception:
+                time.sleep(0.1)
     yield
+    gc.collect()
     if test_db_dir.exists():
-        try:
-            shutil.rmtree(test_db_dir)
-        except Exception:
-            pass
+        for _ in range(5):
+            try:
+                shutil.rmtree(test_db_dir)
+                break
+            except Exception:
+                time.sleep(0.1)
 
 
 # ==========================================

@@ -18,7 +18,7 @@
   <property name="windowTitle">
    <string>Acceso al Sistema</string>
   </property>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>100</x>
@@ -129,6 +129,11 @@
    </layout>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>txtCorreo</tabstop>
+  <tabstop>txtContrasena</tabstop>
+  <tabstop>btnIngresar</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

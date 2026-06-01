@@ -1,5 +1,6 @@
 from PyQt6.QtCore import QObject, pyqtSignal
 
+from src.repositories import ActividadRepository, OfertaRepository
 from src.services.exceptions import (
     CicloNoPermitidoError,
     EstudianteConPracticaActivaError,
@@ -125,7 +126,6 @@ class EstudianteController(QObject):
             else:
                 if hasattr(self.view, "bloquear_bitacora"):
                     self.view.bloquear_bitacora(False)
-                from src.repositories import ActividadRepository
                 act_repo = ActividadRepository()
                 actividades = act_repo.listar_por_practica(practica.id_pr)
                 if hasattr(self.view, "mostrar_mis_actividades"):
@@ -143,7 +143,6 @@ class EstudianteController(QObject):
             elif hasattr(self.view, "obtener_oferta_seleccionada"):
                 id_o = self.view.obtener_oferta_seleccionada()
                 # Lookup company id from offer repo
-                from src.repositories import OfertaRepository
                 o_repo = OfertaRepository()
                 oferta = o_repo.buscar_por_id(id_o)
                 if oferta:

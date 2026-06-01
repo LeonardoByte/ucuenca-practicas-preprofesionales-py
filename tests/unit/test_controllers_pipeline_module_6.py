@@ -1,3 +1,4 @@
+from datetime import date
 from unittest.mock import MagicMock, patch, ANY
 import unittest
 
@@ -331,93 +332,186 @@ def test_administrador_controller_eliminar_usuario_cancelado(qapp):
 # 3. Tests para TutorEmpresarialController
 # ==========================================
 
+def configure_mock_tutor_view(mock_view):
+    mock_view.btnNavPracticantes = MagicMock()
+    mock_view.btnNavEmpresa = MagicMock()
+    mock_view.btnNavCerrarSesion = MagicMock()
+    mock_view.actVerPracticantes = MagicMock()
+    mock_view.actVerEmpresa = MagicMock()
+    mock_view.actCerrarSesion = MagicMock()
+    mock_view.actSalirSistema = MagicMock()
+    mock_view.actAcercaPrograma = MagicMock()
+    mock_view.actAcercaDesarrollador = MagicMock()
+    mock_view.actRepositorioGithub = MagicMock()
+    mock_view.actProponerActividad = MagicMock()
+    mock_view.btnVerBitacora = MagicMock()
+    mock_view.btnEvaluarFormulario3 = MagicMock()
+    mock_view.btnProponerActividad = MagicMock()
+    mock_view.txtBusquedaAlumno = MagicMock()
+    mock_view.stackedWidgetCentral = MagicMock()
+    mock_view.txtNombre = MagicMock()
+    mock_view.txtCorreoElectronico = MagicMock()
+    mock_view.txtContactoPrincipal = MagicMock()
+    mock_view.txtDireccionMatriz = MagicMock()
+    mock_view.txtEstadoConvenio = MagicMock()
+    
+    tblPracticas = MagicMock()
+    tblPracticas.rowCount.return_value = 0
+    tblPracticas.selectedItems.return_value = []
+    mock_view.tblPracticas = tblPracticas
+    
+    mock_view.tblBitacora = MagicMock()
+    mock_view.txaDescripcionActividad = MagicMock()
+
+
 def test_tutor_empresarial_controller_inicializacion(qapp):
     mock_view = MagicMock()
+    configure_mock_tutor_view(mock_view)
+    
     mock_service = MagicMock()
     tutor_perfil = MagicMock()
     tutor_perfil.id_e = 10
     tutor_perfil.id_p = 5
 
     empresa_dummy = MagicMock()
+    empresa_dummy.nombre_empresa = "Empresa Test"
+    empresa_dummy.correo_electronico = "contacto@test.com"
+    empresa_dummy.numeros_contacto = ["1234567"]
+    empresa_dummy.direcciones = ["Calle Falsa 123"]
+    empresa_dummy.estado_de_convenio_emp.value = "ACTIVO"
     mock_service.obtener_datos_empresa_tutor.return_value = empresa_dummy
 
-    practicas_dummy = [MagicMock()]
-    mock_service.obtener_practicas_tutor_emp.return_value = practicas_dummy
+    mock_service.obtener_practicas_tutor_emp.return_value = []
 
-    controller = TutorEmpresarialController(mock_view, mock_service, tutor_perfil)
+    with patch("src.controllers.tutor_empresarial_controller.uic.loadUi"):
+        controller = TutorEmpresarialController(mock_view, mock_service, tutor_perfil)
 
     mock_service.obtener_datos_empresa_tutor.assert_called_once_with(10)
-    mock_view.mostrar_perfil_empresa.assert_called_once_with(empresa_dummy)
+    mock_view.txtNombreEmpresa.setText.assert_called_once_with("Empresa Test")
+    mock_view.txtCorreoElectronicoEmpresa.setText.assert_called_once_with("contacto@test.com")
     mock_service.obtener_practicas_tutor_emp.assert_called_once_with(5)
-    mock_view.mostrar_practicas.assert_called_once_with(practicas_dummy)
 
 
 def test_tutor_empresarial_controller_proponer_actividad(qapp):
     mock_view = MagicMock()
-    mock_view.obtener_practica_seleccionada.return_value = 101
-    mock_view.txt_descripcion_actividad.text.return_value = "Crear API REST"
-
+    configure_mock_tutor_view(mock_view)
+    
     mock_service = MagicMock()
+    tutor_perfil = MagicMock()
+    tutor_perfil.id_e = 10
+    tutor_perfil.id_p = 5
+    
+    mock_service.obtener_datos_empresa_tutor.return_value = None
+    mock_service.obtener_practicas_tutor_emp.return_value = []
+
+    # Mock selection
+    selected_item = MagicMock()
+    selected_item.row.return_value = 0
+    mock_view.tblPracticas.selectedItems.return_value = [selected_item]
+    
+    table_item = MagicMock()
+    table_item.data.return_value = 101
+    mock_view.tblPracticas.item.return_value = table_item
+    
+    # Input text
+    mock_view.txaDescripcionActividad.text.return_value = "Crear API REST"
+    
     mock_service.proponer_actividad_practica.return_value = MagicMock()
 
-    tutor_perfil = MagicMock()
-
-    with patch("src.repositories.ActividadRepository") as mock_repo_class:
+    with patch("src.controllers.tutor_empresarial_controller.uic.loadUi"), \
+         patch("src.controllers.tutor_empresarial_controller.QMessageBox.information") as mock_info, \
+         patch("src.repositories.ActividadRepository") as mock_repo_class:
+        
         mock_repo = MagicMock()
         mock_repo_class.return_value = mock_repo
         mock_repo.listar_por_practica.return_value = []
-
+        
         controller = TutorEmpresarialController(mock_view, mock_service, tutor_perfil)
-
-        callback = mock_view.btn_proponer_actividad.clicked.connect.call_args[0][0]
+        
+        # Trigger the slot connected to btnProponerActividad.clicked
+        callback = mock_view.btnProponerActividad.clicked.connect.call_args[0][0]
         callback()
 
-        mock_service.proponer_actividad_practica.assert_called_once_with(101, "Crear API REST")
-        mock_view.mostrar_exito.assert_called_once()
-        mock_view.txt_descripcion_actividad.clear.assert_called_once()
-        mock_view.mostrar_actividades.assert_called_once()
+    mock_service.proponer_actividad_practica.assert_called_once_with(101, "Crear API REST")
+    mock_info.assert_called_once_with(
+        mock_view, "Actividad Registrada", "La actividad fue guardada correctamente."
+    )
+    mock_view.txaDescripcionActividad.clear.assert_called_once()
 
 
 def test_tutor_empresarial_controller_evaluar_f3_exito(qapp):
     mock_view = MagicMock()
-    mock_view.obtener_practica_seleccionada.return_value = 101
-    mock_view.obtener_estado_firma_evaluacion.return_value = EstadoFirmaFormulario.COMPLETADO
-    mock_view.obtener_fecha_evaluacion.return_value = "2026-05-30"
-
+    configure_mock_tutor_view(mock_view)
+    
     mock_service = MagicMock()
+    tutor_perfil = MagicMock()
+    tutor_perfil.id_e = 10
+    tutor_perfil.id_p = 5
+    
+    mock_service.obtener_datos_empresa_tutor.return_value = None
+    mock_service.obtener_practicas_tutor_emp.return_value = []
+
+    # Mock selection
+    selected_item = MagicMock()
+    selected_item.row.return_value = 0
+    mock_view.tblPracticas.selectedItems.return_value = [selected_item]
+    
+    table_item = MagicMock()
+    table_item.data.return_value = 101
+    mock_view.tblPracticas.item.return_value = table_item
+    
     mock_service.registrar_evaluacion_formulario3.return_value = True
 
-    tutor_perfil = MagicMock()
-    controller = TutorEmpresarialController(mock_view, mock_service, tutor_perfil)
-
-    callback = mock_view.btn_evaluar_f3.clicked.connect.call_args[0][0]
-    callback()
+    with patch("src.controllers.tutor_empresarial_controller.uic.loadUi"), \
+         patch("src.controllers.tutor_empresarial_controller.QMessageBox.information") as mock_info:
+        
+        controller = TutorEmpresarialController(mock_view, mock_service, tutor_perfil)
+        
+        callback = mock_view.btnEvaluarFormulario3.clicked.connect.call_args[0][0]
+        callback()
 
     mock_service.registrar_evaluacion_formulario3.assert_called_once_with(
-        101, EstadoFirmaFormulario.COMPLETADO, "2026-05-30"
+        101, EstadoFirmaFormulario.COMPLETADO, date.today().strftime("%Y-%m-%d")
     )
-    mock_view.mostrar_exito.assert_called_once()
+    mock_info.assert_called_once_with(
+        mock_view, "Evaluación Guardada", "La información fue guardada correctamente."
+    )
 
 
 def test_tutor_empresarial_controller_evaluar_f3_temprana(qapp):
     mock_view = MagicMock()
-    mock_view.obtener_practica_seleccionada.return_value = 101
-    mock_view.obtener_estado_firma_evaluacion.return_value = EstadoFirmaFormulario.COMPLETADO
-    mock_view.obtener_fecha_evaluacion.return_value = "2026-05-20"
-
+    configure_mock_tutor_view(mock_view)
+    
     mock_service = MagicMock()
+    tutor_perfil = MagicMock()
+    tutor_perfil.id_e = 10
+    tutor_perfil.id_p = 5
+    
+    mock_service.obtener_datos_empresa_tutor.return_value = None
+    mock_service.obtener_practicas_tutor_emp.return_value = []
+
+    # Mock selection
+    selected_item = MagicMock()
+    selected_item.row.return_value = 0
+    mock_view.tblPracticas.selectedItems.return_value = [selected_item]
+    
+    table_item = MagicMock()
+    table_item.data.return_value = 101
+    mock_view.tblPracticas.item.return_value = table_item
+    
     mock_service.registrar_evaluacion_formulario3.side_effect = EvaluacionTempranaError(
         "Faltan más de 7 días"
     )
 
-    tutor_perfil = MagicMock()
-    controller = TutorEmpresarialController(mock_view, mock_service, tutor_perfil)
+    with patch("src.controllers.tutor_empresarial_controller.uic.loadUi"), \
+         patch("src.controllers.tutor_empresarial_controller.QMessageBox.warning") as mock_warning:
+        
+        controller = TutorEmpresarialController(mock_view, mock_service, tutor_perfil)
+        
+        callback = mock_view.btnEvaluarFormulario3.clicked.connect.call_args[0][0]
+        callback()
 
-    callback = mock_view.btn_evaluar_f3.clicked.connect.call_args[0][0]
-    callback()
-
-    # Should catch early evaluation error and report warning in UI
-    mock_view.mostrar_advertencia.assert_called_once_with("Faltan más de 7 días")
+    mock_warning.assert_called_once_with(mock_view, "Evaluación Anticipada", "Faltan más de 7 días")
 
 
 # ==========================================
