@@ -24,7 +24,7 @@ def setup_mock_service_and_tutor(id_e=10, id_p=5):
     empresa.correo_electronico = "tutor@innovadora.com"
     empresa.numeros_contacto = ["0987654321"]
     empresa.direcciones = ["Av. Principal 456"]
-    empresa.estado_de_convenio_emp.value = "VIGENTE"
+    empresa.estado_de_convenio_emp.value = "Vigente"
     mock_service.obtener_datos_empresa_tutor.return_value = empresa
 
     # Mock practices list
@@ -64,15 +64,16 @@ def test_tutor_empresarial_navigation_and_profile_loading(qtbot):
     assert view.txtCorreoElectronicoEmpresa.text() == "tutor@innovadora.com"
     assert view.txtContactoPrincipalEmpresa.text() == "0987654321"
     assert view.txtDireccionMatrizEmpresa.text() == "Av. Principal 456"
-    assert view.txtEstadoConvenio.text() == "VIGENTE"
+    assert view.txtEstadoConvenio.text() == "Vigente"
 
     # Passively populated student practices check
     assert view.tblPracticas.rowCount() == 1
     assert view.tblPracticas.item(0, 0).text() == "1799887766"  # Cédula
-    assert view.tblPracticas.item(0, 1).text() == "Kevin Macias"  # Alumno
-    assert view.tblPracticas.item(0, 2).text() == "2026-01-01"
-    assert view.tblPracticas.item(0, 3).text() == "2026-06-30"
-    assert view.tblPracticas.item(0, 4).text() == "EN_DESARROLLO"
+    assert view.tblPracticas.item(0, 1).text() == "kevin.macias@ucuenca.edu.ec"  # Correo
+    assert view.tblPracticas.item(0, 2).text() == "Kevin Macias"  # Alumno
+    assert view.tblPracticas.item(0, 3).text() == "2026-01-01"
+    assert view.tblPracticas.item(0, 4).text() == "2026-06-30"
+    assert view.tblPracticas.item(0, 5).text() == "EN_DESARROLLO"
 
     # StackedWidget index should start at 0
     assert view.stackedWidgetCentral.currentIndex() == 0
@@ -188,7 +189,8 @@ def test_tutor_empresarial_propose_activity_workflow(qtbot):
     act1.descripcion_de_la_tarea = "Implementar testing"
     act1.estado_de_validacion.value = "EN_ESPERA"
 
-    with patch("src.repositories.ActividadRepository") as mock_repo_class:
+    pathed_repo = "src.controllers.tutor_empresarial_controller.ActividadRepository"
+    with patch(pathed_repo) as mock_repo_class:
         mock_repo = MagicMock()
         mock_repo_class.return_value = mock_repo
         mock_repo._datos = [act1]
@@ -218,8 +220,8 @@ def test_tutor_empresarial_propose_activity_workflow(qtbot):
     act2.descripcion_de_la_tarea = "Crear base de datos"
     act2.estado_de_validacion.value = "EN_ESPERA"
 
-    with patch("src.repositories.ActividadRepository") as mock_repo_class, \
-         patch("src.controllers.tutor_empresarial_controller.QMessageBox.information") as mock_info:
+    pathed_info = "src.controllers.tutor_empresarial_controller.QMessageBox.information"
+    with patch(pathed_repo) as mock_repo_class, patch(pathed_info) as mock_info:
         mock_repo = MagicMock()
         mock_repo_class.return_value = mock_repo
         mock_repo._datos = [act1, act2]

@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindowTutorAcademico</class>
+ <widget class="QMainWindow" name="MainWindowTutorAcademico">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1000</width>
+    <height>700</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>11</pointsize>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>Panel del Tutor Académico - Sistema de Prácticas</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QFrame" name="frameSidebar">
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QPushButton" name="pushButton">
+         <property name="text">
+          <string>Ver Estudiantes</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_2">
+         <property name="text">
+          <string>Auditar Bitácora</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_3">
+         <property name="text">
+          <string>Cerrar Sesión</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>476</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QStackedWidget" name="stackedWidgetCentral">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="page">
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="6" column="0" colspan="2">
+         <widget class="QPushButton" name="btnEvaluarFormulario2">
+          <property name="text">
+           <string>EVALUAR RÚBRICA (FORM 2)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="3">
+         <widget class="QPushButton" name="btnAuditarBitacora">
+          <property name="text">
+           <string>AUDITAR BITÁCORA</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Buscar estudiante:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0" colspan="4">
+         <widget class="QTableWidget" name="tblEstudiantes">
+          <property name="editTriggers">
+           <set>QAbstractItemView::NoEditTriggers</set>
+          </property>
+          <property name="selectionMode">
+           <enum>QAbstractItemView::SingleSelection</enum>
+          </property>
+          <property name="selectionBehavior">
+           <enum>QAbstractItemView::SelectRows</enum>
+          </property>
+          <attribute name="horizontalHeaderDefaultSectionSize">
+           <number>140</number>
+          </attribute>
+          <attribute name="horizontalHeaderStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+          <column>
+           <property name="text">
+            <string>Cédula</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Alumno</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Correo electrónico</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Fecha Inicio</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Fecha Fin</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Estado</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+        <item row="3" column="1" colspan="2">
+         <widget class="QLabel" name="label_2">
+          <property name="font">
+           <font>
+            <family>Segoe UI</family>
+            <pointsize>14</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Ver lista de Estudiantes</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1" colspan="3">
+         <widget class="QLineEdit" name="txtBusquedaEstudiante">
+          <property name="placeholderText">
+           <string>Filtrar alumnos por correo electrónico o cédula...</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="page_2">
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="1">
+         <widget class="QLabel" name="label_3">
+          <property name="font">
+           <font>
+            <family>Segoe UI</family>
+            <pointsize>14</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Auditar Bitácora</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="3">
+         <widget class="QTableWidget" name="tblBitacoraAuditoria">
+          <property name="editTriggers">
+           <set>QAbstractItemView::NoEditTriggers</set>
+          </property>
+          <property name="selectionMode">
+           <enum>QAbstractItemView::SingleSelection</enum>
+          </property>
+          <property name="selectionBehavior">
+           <enum>QAbstractItemView::SelectRows</enum>
+          </property>
+          <attribute name="horizontalHeaderStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+          <column>
+           <property name="text">
+            <string>Descripción de Actividad</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QPushButton" name="btnValidarActividad">
+          <property name="text">
+           <string>VALIDAR ACTIVIDAD</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QPushButton" name="btnRechazarActividad">
+          <property name="text">
+           <string>RECHAZAR ACTIVIDAD</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1000</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_Gesti_n">
+    <property name="title">
+     <string>&amp;Gestión</string>
+    </property>
+    <addaction name="actVerEstudiantes"/>
+   </widget>
+   <widget class="QMenu" name="menu_Bit_cora">
+    <property name="title">
+     <string>&amp;Bitácora</string>
+    </property>
+    <addaction name="actAuditarBitacora"/>
+   </widget>
+   <widget class="QMenu" name="menu_Sesi_n">
+    <property name="title">
+     <string>&amp;Sesión</string>
+    </property>
+    <addaction name="actCerrarSesion"/>
+    <addaction name="separator"/>
+    <addaction name="actSalirSistema"/>
+   </widget>
+   <widget class="QMenu" name="menuAy_uda">
+    <property name="title">
+     <string>Ay&amp;uda</string>
+    </property>
+    <addaction name="actAcercaPrograma"/>
+    <addaction name="actAcercaDesarrollador"/>
+    <addaction name="actRepositorioGithub"/>
+   </widget>
+   <addaction name="menu_Gesti_n"/>
+   <addaction name="menu_Bit_cora"/>
+   <addaction name="menu_Sesi_n"/>
+   <addaction name="menuAy_uda"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actVerEstudiantes">
+   <property name="text">
+    <string>Ver Estudiantes</string>
+   </property>
+  </action>
+  <action name="actAuditarBitacora">
+   <property name="text">
+    <string>Auditar Bitácora</string>
+   </property>
+  </action>
+  <action name="actCerrarSesion">
+   <property name="text">
+    <string>Cerrar Sesión</string>
+   </property>
+  </action>
+  <action name="actSalirSistema">
+   <property name="text">
+    <string>Salir del Sistema</string>
+   </property>
+  </action>
+  <action name="actAcercaPrograma">
+   <property name="text">
+    <string>Acerca del Programa</string>
+   </property>
+  </action>
+  <action name="actAcercaDesarrollador">
+   <property name="text">
+    <string>Acerca del Desarrollador</string>
+   </property>
+  </action>
+  <action name="actRepositorioGithub">
+   <property name="text">
+    <string>Repositorio GitHub</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

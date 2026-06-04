@@ -122,19 +122,21 @@ class TutorEmpresarialController(QObject):
                 )
 
                 cedula = est.cedula_dni if est else "N/A"
+                correo = est.correo_electronico if est else "N/A"
                 nombre = est.nombre_y_apellido if est else "N/A"
 
                 self.view.tblPracticas.setItem(row, 0, QTableWidgetItem(cedula))
                 self.view.tblPracticas.setItem(row, 1, QTableWidgetItem(nombre))
-                self.view.tblPracticas.setItem(row, 2, QTableWidgetItem(p.fecha_inicio))
-                self.view.tblPracticas.setItem(row, 3, QTableWidgetItem(p.fecha_fin))
+                self.view.tblPracticas.setItem(row, 2, QTableWidgetItem(correo))
+                self.view.tblPracticas.setItem(row, 3, QTableWidgetItem(p.fecha_inicio))
+                self.view.tblPracticas.setItem(row, 4, QTableWidgetItem(p.fecha_fin))
 
                 estado = (
                     p.estado_de_practica.value
                     if hasattr(p.estado_de_practica, "value")
                     else str(p.estado_de_practica)
                 )
-                self.view.tblPracticas.setItem(row, 4, QTableWidgetItem(estado))
+                self.view.tblPracticas.setItem(row, 5, QTableWidgetItem(estado))
                 self.view.tblPracticas.item(row, 0).setData(Qt.ItemDataRole.UserRole, p.id_pr)
 
             self.filtrar_practicantes()
@@ -157,7 +159,9 @@ class TutorEmpresarialController(QObject):
                     if post else None
                 )
                 correo = est.correo_electronico.lower() if est else ""
-                self.view.tblPracticas.setRowHidden(row, filtro not in correo)
+                cedula = est.cedula_dni.lower() if est else ""
+                hide = (filtro not in correo) and (filtro not in cedula)
+                self.view.tblPracticas.setRowHidden(row, hide)
 
     def obtener_practica_seleccionada(self) -> Optional[int]:
         selected = self.view.tblPracticas.selectedItems()

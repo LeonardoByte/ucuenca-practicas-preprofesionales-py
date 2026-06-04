@@ -12,13 +12,23 @@ from src.controllers.router import Router
 from src.models.estados import RolUsuario
 from src.services.administrador_main_service import AdministradorMainService
 from src.services.login_main_service import LoginMainService
+from src.services.tutor_academico_main_service import TutorAcademicoMainService
 from src.services.tutor_empresarial_main_service import TutorEmpresarialMainService
-from src.views import LoginWindow, MainWindow_Administrador, MainWindow_TutorEmpresarial
+from src.views import (
+    LoginWindow,
+    MainWindow_Administrador,
+    MainWindow_TutorAcademico,
+    MainWindow_TutorEmpresarial,
+)
 
 
 class MainRouter(Router):
     def route_to_role(self, perfil, rol: RolUsuario) -> None:
-        if rol in (RolUsuario.ADMINISTRADOR, RolUsuario.TUTOR_EMPRESARIAL):
+        if rol in (
+            RolUsuario.ADMINISTRADOR,
+            RolUsuario.TUTOR_EMPRESARIAL,
+            RolUsuario.TUTOR_ACADEMICO,
+        ):
             super().route_to_role(perfil, rol)
         else:
             QMessageBox.information(
@@ -42,12 +52,14 @@ def main():
         "login_service": LoginMainService(),
         "administrador_service": AdministradorMainService(),
         "tutor_empresarial_service": TutorEmpresarialMainService(),
+        "tutor_academico_service": TutorAcademicoMainService(),
     }
 
     view_factories = {
         "LoginWindow": LoginWindow,
         RolUsuario.ADMINISTRADOR: MainWindow_Administrador,
         RolUsuario.TUTOR_EMPRESARIAL: MainWindow_TutorEmpresarial,
+        RolUsuario.TUTOR_ACADEMICO: MainWindow_TutorAcademico,
     }
 
     router = MainRouter(services, view_factories)
