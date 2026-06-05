@@ -126,8 +126,8 @@ class TutorEmpresarialController(QObject):
                 nombre = est.nombre_y_apellido if est else "N/A"
 
                 self.view.tblPracticas.setItem(row, 0, QTableWidgetItem(cedula))
-                self.view.tblPracticas.setItem(row, 1, QTableWidgetItem(nombre))
-                self.view.tblPracticas.setItem(row, 2, QTableWidgetItem(correo))
+                self.view.tblPracticas.setItem(row, 1, QTableWidgetItem(correo))
+                self.view.tblPracticas.setItem(row, 2, QTableWidgetItem(nombre))
                 self.view.tblPracticas.setItem(row, 3, QTableWidgetItem(p.fecha_inicio))
                 self.view.tblPracticas.setItem(row, 4, QTableWidgetItem(p.fecha_fin))
 

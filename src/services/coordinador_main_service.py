@@ -239,5 +239,3 @@ class CoordinadorMainService(CoordinadorMainServiceABC):
             and pr.id_p_tutor_acad == 0
             and pr.id_pos in valid_post_ids
         ]
-
-

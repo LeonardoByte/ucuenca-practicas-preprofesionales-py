@@ -1,8 +1,9 @@
 from datetime import date
+import json
 from unittest.mock import ANY, MagicMock, patch
 
 import pytest
-from PyQt6.QtWidgets import QApplication, QMessageBox
+from PyQt6.QtWidgets import QApplication, QMessageBox, QComboBox, QDialog, QLineEdit
 
 from src.controllers import (
     AdministradorController,
@@ -672,78 +673,146 @@ def test_tutor_academico_controller_evaluar_f2_temprana(qapp):
 # 5. Tests para EmpresaController
 # ==========================================
 
+def configure_mock_empresa_view(mock_view):
+    mock_view.txtTituloOferta = MagicMock()
+    mock_view.txtDescripcionOferta = MagicMock()
+    mock_view.txaRequisitos = MagicMock()
+    mock_view.txtDuracionOferta = MagicMock()
+    mock_view.dspnRemuneracion = MagicMock()
+    mock_view.btnPublicar = MagicMock()
+    mock_view.btnVerTerna = MagicMock()
+    mock_view.btnVolverHistorial = MagicMock()
+    mock_view.btnAceptarPostulacion = MagicMock()
+    mock_view.btnRechazarPostulacion = MagicMock()
+    mock_view.txtFiltradoOferta = MagicMock()
+    mock_view.txtBusquedaTutor = MagicMock()
+    mock_view.tblOfertasHistorico = MagicMock()
+    mock_view.tableWidget = MagicMock()
+    mock_view.tblPostulantesTerna = MagicMock()
+    mock_view.stackedWidgetCentral = MagicMock()
+    mock_view.actAcercaPrograma = MagicMock()
+    mock_view.actAcercaDesarrollador = MagicMock()
+    mock_view.actRepositorioGithub = MagicMock()
+
+
 def test_empresa_controller_publicar_oferta(qapp):
     mock_view = MagicMock()
-    mock_view.txt_oferta_descripcion.text.return_value = "Backend dev"
-    mock_view.txt_oferta_requisitos.text.return_value = "FastAPI, PostgreSQL"
-    mock_view.obtener_fecha_publicacion.return_value = "2026-05-30"
-    mock_view.txt_oferta_duracion.text.return_value = "3 meses"
-    mock_view.txt_oferta_remuneracion.text.return_value = "650.0"
+    configure_mock_empresa_view(mock_view)
+    mock_view.txtTituloOferta.text.return_value = "Backend dev"
+    mock_view.txaRequisitos.text.return_value = "FastAPI, PostgreSQL"
+    mock_view.txtDescripcionOferta.text.return_value = "Python Developer"
+    mock_view.txtDuracionOferta.text.return_value = "3 meses"
+    mock_view.dspnRemuneracion.value.return_value = 650.0
 
     mock_service = MagicMock()
     mock_service.registrar_oferta.return_value = MagicMock()
+    mock_service.listar_mis_ofertas_publicadas.return_value = []
+    mock_service.obtener_tutores_de_empresa.return_value = []
 
     empresa_perfil = MagicMock()
     empresa_perfil.id_e = 44
 
-    controller = EmpresaController(mock_view, mock_service, empresa_perfil)
+    with patch("src.controllers.empresa_controller.uic.loadUi"):
+        controller = EmpresaController(mock_view, mock_service, empresa_perfil)
 
-    callback = mock_view.btn_publicar_oferta.clicked.connect.call_args[0][0]
-    callback()
-
-    mock_service.registrar_oferta.assert_called_once_with(
-        44, "Backend dev", "FastAPI, PostgreSQL", "2026-05-30", "3 meses", 650.0
-    )
-    mock_view.mostrar_exito.assert_called_once_with("Oferta publicada con éxito.")
-    mock_view.txt_oferta_descripcion.clear.assert_called_once()
+    with patch("src.controllers.empresa_controller.QMessageBox.information") as mock_info:
+        controller.publicar_oferta()
+        mock_info.assert_called_once()
+        expected_json = json.dumps({"titulo": "Backend dev", "descripcion": "Python Developer"})
+        mock_service.registrar_oferta.assert_called_once_with(
+            44,
+            expected_json,
+            "FastAPI, PostgreSQL",
+            date.today().strftime("%Y-%m-%d"),
+            "3 meses",
+            650.0,
+        )
 
 
 def test_empresa_controller_cargar_terna(qapp):
     mock_view = MagicMock()
-    mock_view.obtener_oferta_seleccionada.return_value = 111
+    configure_mock_empresa_view(mock_view)
 
     mock_service = MagicMock()
+    mock_service.listar_mis_ofertas_publicadas.return_value = []
+    mock_service.obtener_tutores_de_empresa.return_value = []
+
+    # Mock selection
+    selected_item = MagicMock()
+    selected_item.row.return_value = 0
+    mock_view.tblOfertasHistorico.selectedItems.return_value = [selected_item]
+
+    table_item = MagicMock()
+    table_item.data.return_value = 111
+    mock_view.tblOfertasHistorico.item.return_value = table_item
 
     # Mock nested postulations and properties
     post_dummy_1 = MagicMock()
     post_dummy_1.id_o = 111
     post_dummy_1.id_terna = 99
+    post_dummy_1.id_p_estudiante = 201
 
-    mock_service.postulacion_service.postulacion_repo._datos = [post_dummy_1]
+    mock_service.postulacion_service.repo._datos = [post_dummy_1]
 
-    candidatos_dummy = [MagicMock(), MagicMock(), MagicMock()]
+    candidatos_dummy = [post_dummy_1]
     mock_service.visualizar_terna_recibida.return_value = candidatos_dummy
 
-    empresa_perfil = MagicMock()
-    controller = EmpresaController(mock_view, mock_service, empresa_perfil)
+    est = MagicMock(cedula_dni="1722", nombre_y_apellido="Est", correo_electronico="est@unl.edu.ec")
+    mock_service.practica_service.estudiante_repo.buscar_por_id.return_value = est
 
-    controller.cargar_terna_candidatos()
+    empresa_perfil = MagicMock()
+    with patch("src.controllers.empresa_controller.uic.loadUi"):
+        controller = EmpresaController(mock_view, mock_service, empresa_perfil)
+
+    controller.cargar_terna(111)
 
     mock_service.visualizar_terna_recibida.assert_called_once_with(99)
-    mock_view.mostrar_candidatos.assert_called_once_with(candidatos_dummy)
+    assert mock_view.tblPostulantesTerna.insertRow.call_count == 1
 
 
 def test_empresa_controller_contratar_candidato(qapp):
     mock_view = MagicMock()
-    mock_view.obtener_postulacion_seleccionada.return_value = 888
-    mock_view.obtener_tutor_seleccionado.return_value = 999
-    mock_view.obtener_fecha_inicio.return_value = "2026-06-01"
-    mock_view.obtener_fecha_fin.return_value = "2026-09-01"
+    configure_mock_empresa_view(mock_view)
+
+    # Mock selection
+    selected_item = MagicMock()
+    selected_item.row.return_value = 0
+    mock_view.tblPostulantesTerna.selectedItems.return_value = [selected_item]
+
+    table_item = MagicMock()
+    table_item.data.return_value = 888
+    mock_view.tblPostulantesTerna.item.return_value = table_item
 
     mock_service = MagicMock()
+    mock_service.listar_mis_ofertas_publicadas.return_value = []
+    mock_service.obtener_tutores_de_empresa.return_value = []
     mock_service.seleccionar_candidato_ganador.return_value = True
 
     empresa_perfil = MagicMock()
-    controller = EmpresaController(mock_view, mock_service, empresa_perfil)
+    with patch("src.controllers.empresa_controller.uic.loadUi"):
+        controller = EmpresaController(mock_view, mock_service, empresa_perfil)
 
-    callback = mock_view.btn_contratar_candidato.clicked.connect.call_args[0][0]
-    callback()
+    def mock_dialog_exec(self):
+        combos = self.findChildren(QComboBox)
+        line_edits = self.findChildren(QLineEdit)
+        if combos:
+            combos[0].setCurrentIndex(0)
+        if len(line_edits) >= 2:
+            line_edits[0].setText("2026-06-01")
+            line_edits[1].setText("2026-09-01")
+        return QDialog.DialogCode.Accepted
 
-    mock_service.seleccionar_candidato_ganador.assert_called_once_with(
-        888, 999, "2026-06-01", "2026-09-01"
-    )
-    mock_view.mostrar_exito.assert_called_once()
-    mock_view.limpiar_formulario_contratacion.assert_called_once()
+    with patch("src.controllers.empresa_controller.QDialog.exec", mock_dialog_exec), \
+         patch("src.controllers.empresa_controller.QMessageBox.information") as mock_info:
+        # Mocking tutor selection combo
+        tutor = MagicMock(id_p=999)
+        tutor.nombre_y_apellido = "Tutor Name"
+        mock_service.obtener_tutores_de_empresa.return_value = [tutor]
+        controller.aceptar_postulacion()
+        mock_service.seleccionar_candidato_ganador.assert_called_once_with(
+            888, 999, "2026-06-01", "2026-09-01"
+        )
+        mock_info.assert_called_once()
 
 
 # ==========================================
