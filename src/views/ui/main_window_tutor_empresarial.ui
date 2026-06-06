@@ -69,7 +69,7 @@
     <item>
      <widget class="QStackedWidget" name="stackedWidgetCentral">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page">
        <layout class="QGridLayout" name="gridLayout">
@@ -143,7 +143,14 @@
           </column>
          </widget>
         </item>
-        <item row="0" column="1">
+        <item row="3" column="2">
+         <widget class="QPushButton" name="btnEvaluarFormulario3">
+          <property name="text">
+           <string>EVALUAR RÚBRICA</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0" colspan="3">
          <widget class="QLabel" name="label">
           <property name="font">
            <font>
@@ -156,12 +163,8 @@
           <property name="text">
            <string>Ver Practicantes</string>
           </property>
-         </widget>
-        </item>
-        <item row="3" column="2">
-         <widget class="QPushButton" name="btnEvaluarFormulario3">
-          <property name="text">
-           <string>EVALUAR RÚBRICA</string>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
@@ -179,6 +182,9 @@
           </property>
           <property name="text">
            <string>VER BITÁCORA</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>

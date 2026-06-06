@@ -7,8 +7,8 @@ from src.services.interfaces.postulacion_service_abc import PostulacionServiceAB
 
 
 class PostulacionService(PostulacionServiceABC):
-    def __init__(self, repo: Optional[PostulacionRepository] = None) -> None:
-        self.repo = repo or PostulacionRepository()
+    def __init__(self, postulacion_repo: Optional[PostulacionRepository] = None) -> None:
+        self.postulacion_repo = postulacion_repo or PostulacionRepository()
 
     def registrar_postulacion(
         self,
@@ -27,23 +27,23 @@ class PostulacionService(PostulacionServiceABC):
             fecha_postulacion=fecha_postulacion,
             estado_de_postulacion=EstadoPostulacion.PENDIENTE
         )
-        if self.repo.guardar(post):
+        if self.postulacion_repo.guardar(post):
             return post
         return None
 
     def cambiar_estado(self, id_pos: int, nuevo_estado: EstadoPostulacion) -> bool:
-        post = self.repo.buscar_por_id(id_pos)
+        post = self.postulacion_repo.buscar_por_id(id_pos)
         if not post:
             return False
         post.estado_de_postulacion = nuevo_estado
-        return self.repo.guardar(post)
+        return self.postulacion_repo.guardar(post)
 
     def buscar_postulacion_por_id(self, id_pos: int) -> Optional[Postulacion]:
-        return self.repo.buscar_por_id(id_pos)
+        return self.postulacion_repo.buscar_por_id(id_pos)
 
     def _actualizar_y_guardar_terna(self, p: Postulacion, next_terna_id: int) -> bool:
         p.id_terna = next_terna_id
-        return self.repo.guardar(p)
+        return self.postulacion_repo.guardar(p)
 
     def agrupar_y_despachar_terna(self, id_postulaciones: list[int]) -> bool:
         if len(id_postulaciones) != 3:
@@ -52,7 +52,7 @@ class PostulacionService(PostulacionServiceABC):
             )
 
         # Cargar postulaciones usando list comprehension sin bucle for
-        postulaciones = [self.repo.buscar_por_id(id_pos) for id_pos in id_postulaciones]
+        postulaciones = [self.postulacion_repo.buscar_por_id(id_pos) for id_pos in id_postulaciones]
 
         # Verificar si alguna postulación no existe
         if any(p is None for p in postulaciones):
@@ -67,8 +67,8 @@ class PostulacionService(PostulacionServiceABC):
             )
 
         # Obtener un id_terna único autoincremental
-        self.repo._cargar_datos()
-        ternas = [p.id_terna for p in self.repo._datos if p.id_terna is not None]
+        self.postulacion_repo._cargar_datos()
+        ternas = [p.id_terna for p in self.postulacion_repo._datos if p.id_terna is not None]
         next_terna_id = max(ternas) + 1 if ternas else 1
 
         # Ejecutar mutaciones y guardar de forma funcional
@@ -77,4 +77,4 @@ class PostulacionService(PostulacionServiceABC):
         return True
 
     def listar_por_id_terna(self, id_terna: int) -> list[Postulacion]:
-        return self.repo.listar_por_id_terna(id_terna)
+        return self.postulacion_repo.listar_por_id_terna(id_terna)

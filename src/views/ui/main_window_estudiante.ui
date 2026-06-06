@@ -1,0 +1,536 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindowEstudiante</class>
+ <widget class="QMainWindow" name="MainWindowEstudiante">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1000</width>
+    <height>700</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>11</pointsize>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>Panel del Estudiante - Sistema de Prácticas</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QFrame" name="frameSidebar">
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QPushButton" name="btnNavOfertas">
+         <property name="text">
+          <string>Ver ofertas</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnNavPostulaciones">
+         <property name="text">
+          <string>Mis postulaciones</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnNavSolicitar">
+         <property name="text">
+          <string>Solicitudes</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnNavBitacora">
+         <property name="text">
+          <string>Bitácora</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnNavCerrarSesion">
+         <property name="text">
+          <string>Cerrar sesión</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>400</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QStackedWidget" name="stackedWidgetCentral">
+      <property name="currentIndex">
+       <number>3</number>
+      </property>
+      <widget class="QWidget" name="page">
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="0" colspan="3">
+         <widget class="QLabel" name="label_2">
+          <property name="font">
+           <font>
+            <family>Segoe UI</family>
+            <pointsize>14</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Ver ofertas</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Buscar Oferta:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" colspan="3">
+         <widget class="QTableWidget" name="tblOfertasDisponibles">
+          <property name="editTriggers">
+           <set>QAbstractItemView::NoEditTriggers</set>
+          </property>
+          <property name="selectionMode">
+           <enum>QAbstractItemView::SingleSelection</enum>
+          </property>
+          <property name="selectionBehavior">
+           <enum>QAbstractItemView::SelectRows</enum>
+          </property>
+          <attribute name="horizontalHeaderDefaultSectionSize">
+           <number>155</number>
+          </attribute>
+          <attribute name="horizontalHeaderStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+          <column>
+           <property name="text">
+            <string>Título</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Empresa</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Duración</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Remuneración</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Requisitos</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+        <item row="3" column="2">
+         <widget class="QPushButton" name="btnPostularOferta">
+          <property name="text">
+           <string>Postular</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>555</width>
+            <height>28</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="1" column="1" colspan="2">
+         <widget class="QLineEdit" name="txtFiltradoOfertas">
+          <property name="placeholderText">
+           <string>Filtrar ofertas por título...</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="page_2">
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="font">
+           <font>
+            <family>Segoe UI</family>
+            <pointsize>14</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Ver mis postulaciones</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QTableWidget" name="tblMisPostulaciones">
+          <property name="editTriggers">
+           <set>QAbstractItemView::NoEditTriggers</set>
+          </property>
+          <property name="selectionMode">
+           <enum>QAbstractItemView::SingleSelection</enum>
+          </property>
+          <property name="selectionBehavior">
+           <enum>QAbstractItemView::SelectRows</enum>
+          </property>
+          <attribute name="horizontalHeaderDefaultSectionSize">
+           <number>194</number>
+          </attribute>
+          <attribute name="horizontalHeaderStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+          <column>
+           <property name="text">
+            <string>ID Oferta</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Título de la Vacante</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Empresa</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Estado</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="page_4">
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="5" column="0">
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>Detalles de la empres</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QLineEdit" name="txtNombreEmpresa"/>
+        </item>
+        <item row="7" column="3">
+         <widget class="QPushButton" name="btnEnviarSolicitud">
+          <property name="text">
+           <string>Enviar Solicitud</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QLineEdit" name="txtDetallesEmpresa"/>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>Nombre de la empresa:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="4">
+         <widget class="QLabel" name="label_4">
+          <property name="font">
+           <font>
+            <family>Segoe UI</family>
+            <pointsize>14</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Solicitud de autorización de práctica</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="4" column="1">
+         <spacer name="verticalSpacer_5">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="6" column="1">
+         <spacer name="verticalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="0" column="0" colspan="3">
+         <spacer name="verticalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="page_3">
+       <layout class="QGridLayout" name="gridLayout_4">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_7">
+          <property name="font">
+           <font>
+            <family>Segoe UI</family>
+            <pointsize>14</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Ver mis actividades</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QTableWidget" name="tblMisActividades">
+          <property name="editTriggers">
+           <set>QAbstractItemView::NoEditTriggers</set>
+          </property>
+          <property name="selectionMode">
+           <enum>QAbstractItemView::SingleSelection</enum>
+          </property>
+          <property name="selectionBehavior">
+           <enum>QAbstractItemView::SelectRows</enum>
+          </property>
+          <attribute name="horizontalHeaderDefaultSectionSize">
+           <number>388</number>
+          </attribute>
+          <attribute name="horizontalHeaderStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+          <column>
+           <property name="text">
+            <string>Descripción de la Actividad</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Estado de Validación</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QGroupBox" name="grpNuevaActividad">
+          <property name="title">
+           <string>Nueva Propuesta de Actividad</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_2">
+           <item>
+            <widget class="QLabel" name="label_8">
+             <property name="text">
+              <string>Redacte la descripción detallada de la tarea asignada:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="txaDescripcionActividad"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnProponerActividad">
+             <property name="text">
+              <string>ENVIAR ACTIVIDAD</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1000</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_Convocatorias">
+    <property name="title">
+     <string>&amp;Convocatorias</string>
+    </property>
+    <addaction name="actVerOfertas"/>
+    <addaction name="actMisPostulaciones"/>
+   </widget>
+   <widget class="QMenu" name="menu_Tr_mites">
+    <property name="title">
+     <string>&amp;Trámites</string>
+    </property>
+    <addaction name="actSolicitarAutorizacion"/>
+   </widget>
+   <widget class="QMenu" name="menu_Bit_cora">
+    <property name="title">
+     <string>&amp;Bitácora</string>
+    </property>
+    <addaction name="actVerActividades"/>
+    <addaction name="actRegistrarActividad"/>
+   </widget>
+   <widget class="QMenu" name="menu_Sesi_n">
+    <property name="title">
+     <string>&amp;Sesión</string>
+    </property>
+    <addaction name="actCerrarSesion"/>
+    <addaction name="separator"/>
+    <addaction name="actSalirSistema"/>
+   </widget>
+   <widget class="QMenu" name="menuAy_uda">
+    <property name="title">
+     <string>Ay&amp;uda</string>
+    </property>
+    <addaction name="actAcercaPrograma"/>
+    <addaction name="actAcercaDesarrollador"/>
+    <addaction name="actRepositorioGithub"/>
+   </widget>
+   <addaction name="menu_Convocatorias"/>
+   <addaction name="menu_Tr_mites"/>
+   <addaction name="menu_Bit_cora"/>
+   <addaction name="menu_Sesi_n"/>
+   <addaction name="menuAy_uda"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actVerOfertas">
+   <property name="text">
+    <string>Ver ofertas</string>
+   </property>
+  </action>
+  <action name="actMisPostulaciones">
+   <property name="text">
+    <string>Mis postulaciones</string>
+   </property>
+  </action>
+  <action name="actSolicitarAutorizacion">
+   <property name="text">
+    <string>Solicitar autorización</string>
+   </property>
+  </action>
+  <action name="actVerActividades">
+   <property name="text">
+    <string>Ver actividades</string>
+   </property>
+  </action>
+  <action name="actRegistrarActividad">
+   <property name="text">
+    <string>Registrar actividad</string>
+   </property>
+  </action>
+  <action name="actCerrarSesion">
+   <property name="text">
+    <string>Cerrar sesión</string>
+   </property>
+  </action>
+  <action name="actSalirSistema">
+   <property name="text">
+    <string>Salir del sistema</string>
+   </property>
+  </action>
+  <action name="actAcercaPrograma">
+   <property name="text">
+    <string>Acerca del programa</string>
+   </property>
+  </action>
+  <action name="actAcercaDesarrollador">
+   <property name="text">
+    <string>Acerca del desarrollador</string>
+   </property>
+  </action>
+  <action name="actRepositorioGithub">
+   <property name="text">
+    <string>Repositorio GitHub</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
