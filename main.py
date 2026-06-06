@@ -11,6 +11,7 @@ from PyQt6.QtWidgets import QApplication, QMessageBox
 from src.controllers.router import Router
 from src.models.estados import RolUsuario
 from src.services.administrador_main_service import AdministradorMainService
+from src.services.coordinador_main_service import CoordinadorMainService
 from src.services.empresa_main_service import EmpresaMainService
 from src.services.login_main_service import LoginMainService
 from src.services.tutor_academico_main_service import TutorAcademicoMainService
@@ -18,6 +19,7 @@ from src.services.tutor_empresarial_main_service import TutorEmpresarialMainServ
 from src.views import (
     LoginWindow,
     MainWindow_Administrador,
+    MainWindow_Coordinador,
     MainWindow_Empresa,
     MainWindow_TutorAcademico,
     MainWindow_TutorEmpresarial,
@@ -31,6 +33,7 @@ class MainRouter(Router):
             RolUsuario.TUTOR_EMPRESARIAL,
             RolUsuario.TUTOR_ACADEMICO,
             RolUsuario.EMPRESARIO,
+            RolUsuario.COORDINADOR,
         ):
             super().route_to_role(perfil, rol)
         else:
@@ -57,6 +60,7 @@ def main():
         "tutor_empresarial_service": TutorEmpresarialMainService(),
         "tutor_academico_service": TutorAcademicoMainService(),
         "empresa_service": EmpresaMainService(),
+        "coordinador_service": CoordinadorMainService(),
     }
 
     view_factories = {
@@ -65,6 +69,7 @@ def main():
         RolUsuario.TUTOR_EMPRESARIAL: MainWindow_TutorEmpresarial,
         RolUsuario.TUTOR_ACADEMICO: MainWindow_TutorAcademico,
         RolUsuario.EMPRESARIO: MainWindow_Empresa,
+        RolUsuario.COORDINADOR: MainWindow_Coordinador,
     }
 
     router = MainRouter(services, view_factories)

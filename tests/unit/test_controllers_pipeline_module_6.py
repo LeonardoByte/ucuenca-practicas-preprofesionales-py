@@ -20,6 +20,7 @@ from src.models.estados import (
     EstadoMatricula,
     EstadoValidacionActividad,
     RolUsuario,
+    EstadoPostulacion,
 )
 from src.services.exceptions import (
     CredencialesInvalidasError,
@@ -819,82 +820,196 @@ def test_empresa_controller_contratar_candidato(qapp):
 # 6. Tests para CoordinadorController
 # ==========================================
 
+def configure_mock_coordinador_view(mock_view):
+    mock_view.btnNavPostulaciones = MagicMock()
+    mock_view.btnNavAsignaciones = MagicMock()
+    mock_view.btnNavSolicitudes = MagicMock()
+    mock_view.btnNavCierre = MagicMock()
+    mock_view.btnNavCerrarSesion = MagicMock()
+    mock_view.actRevisarPostulaciones = MagicMock()
+    mock_view.actGenerarTernas = MagicMock()
+    mock_view.actAsignarTutores = MagicMock()
+    mock_view.actAutorizacionesPendientes = MagicMock()
+    mock_view.actEmitirOficios = MagicMock()
+    mock_view.actCierreOficial = MagicMock()
+    mock_view.actCerrarSesion = MagicMock()
+    mock_view.actSalirSistema = MagicMock()
+    mock_view.actAcercaPrograma = MagicMock()
+    mock_view.actAcercaDesarrollador = MagicMock()
+    mock_view.actRepositorioGithub = MagicMock()
+    mock_view.btnValidarPostulacion = MagicMock()
+    mock_view.btnRechazarPostulacion = MagicMock()
+    mock_view.btnEnviarTerna = MagicMock()
+    mock_view.btnAsignarTutor = MagicMock()
+    mock_view.btnAprobarAutorizacion = MagicMock()
+    mock_view.btnRechazarAutorizacion = MagicMock()
+    mock_view.tblPostulacionesPendientes = MagicMock()
+    mock_view.tblOfertasConteo = MagicMock()
+    mock_view.tblPracticasSinTutor = MagicMock()
+    mock_view.tblAutorizacionesPendientes = MagicMock()
+    mock_view.tblOficiosPendientes = MagicMock()
+    mock_view.tblPracticasActivas = MagicMock()
+    mock_view.cmbTutoresDisponibles = MagicMock()
+    mock_view.stackedWidgetCentral = MagicMock()
+    mock_view.btnEjecutarCierre = MagicMock()
+
+
 def test_coordinador_controller_enviar_terna_invalida(qapp):
     mock_view = MagicMock()
-    # Selected count != 3
-    mock_view.obtener_postulaciones_terna_seleccionadas.return_value = [10, 11]
+    configure_mock_coordinador_view(mock_view)
 
     mock_service = MagicMock()
+    mock_service.revisar_postulaciones_pendientes.return_value = []
+    mock_service.listar_ofertas_con_conteo_validadas.return_value = []
+    mock_service.listar_solicitudes_autorizacion_pendientes.return_value = []
+    mock_service.listar_solicitudes_oficio_pendientes.return_value = []
+    mock_service.listar_practicas_pendientes_de_tutor.return_value = []
+
+    # Mock selected row conteo: only 2 postulations
+    selected_item = MagicMock()
+    selected_item.row.return_value = 0
+    mock_view.tblOfertasConteo.selectedItems.return_value = [selected_item]
+
+    item_id = MagicMock()
+    item_id.data.return_value = 999
+    mock_view.tblOfertasConteo.item.return_value = item_id
+
+    mock_service.postulacion_repo._datos = [
+        MagicMock(id_pos=1, id_o=999, estado_de_postulacion=EstadoPostulacion.VALIDADA),
+        MagicMock(id_pos=2, id_o=999, estado_de_postulacion=EstadoPostulacion.VALIDADA),
+    ]
+
     coordinador_perfil = MagicMock()
 
-    controller = CoordinadorController(mock_view, mock_service, coordinador_perfil)
+    with patch("src.controllers.coordinador_controller.uic.loadUi"):
+        _controller = CoordinadorController(mock_view, mock_service, coordinador_perfil)
 
-    callback = mock_view.btn_enviar_terna.clicked.connect.call_args[0][0]
-    callback()
-
-    mock_service.enviar_terna_a_empresa.assert_not_called()
-    mock_view.mostrar_error.assert_called_once_with(
-        "Debe seleccionar exactamente 3 postulaciones para enviar una terna."
-    )
+    with patch(
+        "src.controllers.coordinador_controller.QMessageBox.question",
+        return_value=QMessageBox.StandardButton.Yes,
+    ), patch("src.controllers.coordinador_controller.QMessageBox.warning") as mock_warn:
+        _controller.enviar_terna()
+        mock_warn.assert_called_once_with(
+            mock_view, "Validación", "No existen suficientes postulaciones validadas."
+        )
+        mock_service.enviar_terna_a_empresa.assert_not_called()
 
 
 def test_coordinador_controller_enviar_terna_valida(qapp):
     mock_view = MagicMock()
-    mock_view.obtener_postulaciones_terna_seleccionadas.return_value = [10, 11, 12]
+    configure_mock_coordinador_view(mock_view)
 
     mock_service = MagicMock()
+    mock_service.revisar_postulaciones_pendientes.return_value = []
+    mock_service.listar_ofertas_con_conteo_validadas.return_value = []
+    mock_service.listar_solicitudes_autorizacion_pendientes.return_value = []
+    mock_service.listar_solicitudes_oficio_pendientes.return_value = []
+    mock_service.listar_practicas_pendientes_de_tutor.return_value = []
     mock_service.enviar_terna_a_empresa.return_value = True
 
+    # Mock selection
+    selected_item = MagicMock()
+    selected_item.row.return_value = 0
+    mock_view.tblOfertasConteo.selectedItems.return_value = [selected_item]
+
+    item_id = MagicMock()
+    item_id.data.return_value = 999
+    mock_view.tblOfertasConteo.item.return_value = item_id
+
+    mock_service.postulacion_repo._datos = [
+        MagicMock(id_pos=10, id_o=999, estado_de_postulacion=EstadoPostulacion.VALIDADA),
+        MagicMock(id_pos=11, id_o=999, estado_de_postulacion=EstadoPostulacion.VALIDADA),
+        MagicMock(id_pos=12, id_o=999, estado_de_postulacion=EstadoPostulacion.VALIDADA),
+    ]
+
     coordinador_perfil = MagicMock()
-    controller = CoordinadorController(mock_view, mock_service, coordinador_perfil)
 
-    callback = mock_view.btn_enviar_terna.clicked.connect.call_args[0][0]
-    callback()
+    with patch("src.controllers.coordinador_controller.uic.loadUi"):
+        _controller = CoordinadorController(mock_view, mock_service, coordinador_perfil)
 
-    mock_service.enviar_terna_a_empresa.assert_called_once_with([10, 11, 12])
-    mock_view.mostrar_exito.assert_called_once()
+    with patch(
+        "src.controllers.coordinador_controller.QMessageBox.question",
+        return_value=QMessageBox.StandardButton.Yes,
+    ), patch("src.controllers.coordinador_controller.QMessageBox.information") as mock_info:
+        _controller.enviar_terna()
+        mock_service.enviar_terna_a_empresa.assert_called_once_with([10, 11, 12])
+        mock_info.assert_called_once()
 
 
 def test_coordinador_controller_evaluar_autorizacion(qapp):
     mock_view = MagicMock()
-    mock_view.obtener_solicitud_autorizacion_seleccionada.return_value = 77
-    mock_view.txt_nombre_destinatario.text.return_value = "Carlos Cevallos"
-    mock_view.txt_cargo_destinatario.text.return_value = "Rector"
+    configure_mock_coordinador_view(mock_view)
 
     mock_service = MagicMock()
+    mock_service.revisar_postulaciones_pendientes.return_value = []
+    mock_service.listar_ofertas_con_conteo_validadas.return_value = []
+    mock_service.listar_solicitudes_autorizacion_pendientes.return_value = []
+    mock_service.listar_solicitudes_oficio_pendientes.return_value = []
+    mock_service.listar_practicas_pendientes_de_tutor.return_value = []
     mock_service.evaluar_solicitud_autorizacion.return_value = True
+
+    # Mock selection
+    selected_item = MagicMock()
+    selected_item.row.return_value = 0
+    mock_view.tblAutorizacionesPendientes.selectedItems.return_value = [selected_item]
+
+    item_id = MagicMock()
+    item_id.data.return_value = 77
+    mock_view.tblAutorizacionesPendientes.item.return_value = item_id
 
     coordinador_perfil = MagicMock()
     coordinador_perfil.id_p = 50
 
-    controller = CoordinadorController(mock_view, mock_service, coordinador_perfil)
+    with patch("src.controllers.coordinador_controller.uic.loadUi"):
+        _controller = CoordinadorController(mock_view, mock_service, coordinador_perfil)
 
-    callback = mock_view.btn_aprobar_autorizacion.clicked.connect.call_args[0][0]
-    callback()
-
-    mock_service.evaluar_solicitud_autorizacion.assert_called_once_with(
-        77, True, 50, "Carlos Cevallos", "Rector"
-    )
-    mock_view.mostrar_exito.assert_called_once()
-    mock_view.txt_nombre_destinatario.clear.assert_called_once()
+    with patch(
+        "src.controllers.coordinador_controller.QMessageBox.question",
+        return_value=QMessageBox.StandardButton.Yes,
+    ), patch("src.controllers.coordinador_controller.QMessageBox.information") as mock_info:
+        _controller.aprobar_autorizacion()
+        mock_service.evaluar_solicitud_autorizacion.assert_called_once_with(
+            77, True, 50, "Representante", "Director"
+        )
+        mock_info.assert_called_once()
 
 
 def test_coordinador_controller_aprobar_cierre_documentacion_incompleta(qapp):
     mock_view = MagicMock()
-    mock_view.obtener_practica_seleccionada.return_value = 500
+    configure_mock_coordinador_view(mock_view)
 
     mock_service = MagicMock()
+    mock_service.revisar_postulaciones_pendientes.return_value = []
+    mock_service.listar_ofertas_con_conteo_validadas.return_value = []
+    mock_service.listar_solicitudes_autorizacion_pendientes.return_value = []
+    mock_service.listar_solicitudes_oficio_pendientes.return_value = []
+    mock_service.listar_practicas_pendientes_de_tutor.return_value = []
     mock_service.ejecutar_cierre_oficial_practica.side_effect = DocumentacionIncompletaError(
         "Falta firma de CC y formulario 2"
     )
 
+    # Mock selection
+    selected_item = MagicMock()
+    selected_item.row.return_value = 0
+    mock_view.tblPracticasActivas.selectedItems.return_value = [selected_item]
+
+    item_id = MagicMock()
+    item_id.data.return_value = 500
+    mock_view.tblPracticasActivas.item.return_value = item_id
+
     coordinador_perfil = MagicMock()
-    controller = CoordinadorController(mock_view, mock_service, coordinador_perfil)
 
-    callback = mock_view.btn_aprobar_cierre.clicked.connect.call_args[0][0]
-    callback()
+    with patch("src.controllers.coordinador_controller.uic.loadUi"):
+        _controller = CoordinadorController(mock_view, mock_service, coordinador_perfil)
 
-    mock_view.mostrar_advertencia.assert_called_once_with("Falta firma de CC y formulario 2")
+    with patch(
+        "src.controllers.coordinador_controller.QMessageBox.question",
+        return_value=QMessageBox.StandardButton.Yes,
+    ), patch("src.controllers.coordinador_controller.QMessageBox.critical") as mock_crit:
+        _controller.ejecutar_cierre()
+        mock_crit.assert_called_with(
+            mock_view, "Error de Documentación", "Falta firma de CC y formulario 2"
+        )
 
 
 # ==========================================
