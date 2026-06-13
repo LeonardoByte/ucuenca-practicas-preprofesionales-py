@@ -10,7 +10,10 @@ def mostrar_ayuda_dialog(view, index: int) -> None:
     dialog.stackedWidgetAyuda.setCurrentIndex(index)
     dialog.pushButton.clicked.connect(dialog.accept)
 
-    if index in (1, 2):
+    if index == 2:
         QDesktopServices.openUrl(QUrl("https://github.com/LeonardoByte"))
+
+    if index == 3:
+        QDesktopServices.openUrl(QUrl("https://github.com/LeonardoByte/ucuenca-practicas-preprofesionales-py"))
 
     dialog.exec()
