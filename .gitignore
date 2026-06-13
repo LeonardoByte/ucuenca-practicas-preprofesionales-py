@@ -16,8 +16,7 @@ env/
 *.swo
 
 # Project specific storage
-storage/documents/*
-!storage/documents/.gitkeep
+storage/
 
 # Ignore pytest cache and test outputs
 .pytest_cache/
