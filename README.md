@@ -30,7 +30,7 @@ La justificación de este proyecto radica en la implantación de una arquitectur
 El sistema está concebido bajo rigurosos estándares de ingeniería de software modernos, adaptados a un flujo de desarrollo autónomo:
 
 * **Patrón de Arquitectura Base:** Arquitectura en capas guiada por el patrón **Model-View-Controller (MVC)**, extendido con una capa independiente de **Servicios** para el aislamiento de las reglas de negocio y una capa de **Persistencia** abstracta.
-* **Evolución del Almacenamiento (Data Agnostic):** El diseño inicial implementa persistencia de datos plana mediante estructuras vectoriales en archivos locales (formatos **.dat**). No obstante, la capa de datos se encuentra completamente desacoplada mediante abstracciones puras, preparada estructuralmente para realizar una migración transparente hacia un motor de base de datos relacional **PostgreSQL** sin alterar el comportamiento de los controladores de negocio.
+* **Evolución del Almacenamiento (Data Agnostic):** El diseño inicial implementa persistencia de datos plana mediante estructuras vectoriales en archivos locales (formatos **.dat**). No obstante, la capa de datos se encuentra completamente desacoplada mediante abstracciones puras, preparada estructuralmente para realizar una migración transparente hacia cualquier motor de base de datos.
 * **Paradigmas Combinados:** Se explota la **Programación Orientada a Objetos (POO)** para el modelado semántico de las entidades del dominio, interactuando en sinergia con la **Programación Funcional** para los procesos puros de filtrado de datos, ordenamiento de ternas y cálculos estadísticos de reportes.
 * **Ecosistema Gráfico:** La interfaz de usuario se construye de forma modular y escalable mediante **PyQt6 / PySide6** utilizando ventanas principales (`MainWindow`) independientes por cada rol de usuario, garantizando el desacoplamiento visual y la separación absoluta de responsabilidades gráficas.
 
@@ -38,13 +38,14 @@ El sistema está concebido bajo rigurosos estándares de ingeniería de software
 
 ## 4. Actores del Sistema y Roles Operativos
 
-El SGPP interactúa dinámicamente con cinco (5) actores del negocio, cada uno provisto de un entorno operativo exclusivo y aislado:
+El SGPP interactúa dinámicamente con seis (6) actores del negocio, cada uno provisto de un entorno operativo exclusivo y aislado:
 
-1. **Estudiante:** Actor transaccional. Registra su perfil, postula a vacantes priorizadas, genera solicitudes excepcionales de validación para empresas autogestionadas y reporta de forma semanal su bitácora de actividades junto con la carga de los formularios de evaluación correspondientes.
-2. **Empresa:** Actor oferente. Publica y mantiene plazas de prácticas disponibles, evalúa los expedientes académicos curriculares y las hojas de vida enviadas dentro de las ternas universitarias, y selecciona formalmente al candidato idóneo.
-3. **Coordinador de Vinculación:** Máxima autoridad regulatoria y cerebro del sistema. Supervisa el cumplimiento de los ciclos académicos, valida los convenios institucionales vigentes, emite de forma digital certificados u oficios institucionales, conforma las ternas y autoriza el cierre definitivo de las prácticas tras aprobar el Formulario 1 matriz.
-4. **Tutor Académico:** Miembro del cuerpo docente designado para el seguimiento pedagógico y técnico del estudiante. Valida o rechaza el plan diario/semanal de actividades en el sistema y emite la rúbrica cuantitativa final (Formulario 2).
-5. **Tutor Empresarial:** Supervisor asignado por la organización receptora dentro del espacio laboral. Certifica la asistencia del estudiante, co-valida las actividades ejecutadas y provee la evaluación de desempeño corporativo (Formulario 3).
+1. **Administrador del Sistema:** Actor con privilegios de sistema. Gestiona usuarios, roles y reportes.
+2. **Estudiante:** Actor transaccional. Registra su perfil, postula a vacantes priorizadas, genera solicitudes excepcionales de validación para empresas autogestionadas y reporta de forma semanal su bitácora de actividades junto con la carga de los formularios de evaluación correspondientes.
+3. **Empresa:** Actor oferente. Publica y mantiene plazas de prácticas disponibles, evalúa los expedientes académicos curriculares y las hojas de vida enviadas dentro de las ternas universitarias, y selecciona formalmente al candidato idóneo.
+4. **Coordinador de Vinculación:** Máxima autoridad regulatoria y cerebro del sistema. Supervisa el cumplimiento de los ciclos académicos, valida los convenios institucionales vigentes, emite de forma digital certificados u oficios institucionales, conforma las ternas y autoriza el cierre definitivo de las prácticas tras aprobar el Formulario 1 matriz.
+5. **Tutor Académico:** Miembro del cuerpo docente designado para el seguimiento pedagógico y técnico del estudiante. Valida o rechaza el plan diario/semanal de actividades en el sistema y emite la rúbrica cuantitativa final (Formulario 2).
+6. **Tutor Empresarial:** Supervisor asignado por la organización receptora dentro del espacio laboral. Certifica la asistencia del estudiante, co-valida las actividades ejecutadas y provee la evaluación de desempeño corporativo (Formulario 3).
 
 ---
 

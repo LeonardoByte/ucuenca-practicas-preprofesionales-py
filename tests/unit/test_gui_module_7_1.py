@@ -225,6 +225,7 @@ def test_admin_create_student_success(qtbot):
     view.txtEstudianteDireccion.setText("Cuenca")
     view.sbxEstudianteCiclo.setValue(5)
     view.comboBox.setCurrentIndex(0) # "Matriculado"
+    view.txtEstudianteContrasenha.setText("password")
 
     mock_service.crear_cuenta_usuario_sistema.return_value = MagicMock()
 

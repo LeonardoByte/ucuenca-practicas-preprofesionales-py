@@ -21,6 +21,9 @@
   <property name="windowTitle">
    <string>Panel del Coordinador de Prácticas - Sistema de Prácticas</string>
   </property>
+  <property name="layoutDirection">
+   <enum>Qt::LeftToRight</enum>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
@@ -32,31 +35,50 @@
        <enum>QFrame::Raised</enum>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="leftMargin">
+        <number>11</number>
+       </property>
+       <property name="topMargin">
+        <number>11</number>
+       </property>
+       <property name="rightMargin">
+        <number>11</number>
+       </property>
+       <property name="bottomMargin">
+        <number>11</number>
+       </property>
        <item>
         <widget class="QPushButton" name="btnNavPostulaciones">
          <property name="text">
-          <string>Postulaciones y ternas</string>
+          <string>Postulación y terna</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnNavOferas">
+         <property name="text">
+          <string>Validar ofertas</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QPushButton" name="btnNavAsignaciones">
          <property name="text">
-          <string>Asignación de tutores</string>
+          <string>Asignar tutor</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QPushButton" name="btnNavSolicitudes">
          <property name="text">
-          <string>Autorizaciones y oficios</string>
+          <string>Autorizaciones</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QPushButton" name="btnNavCierre">
          <property name="text">
-          <string>Cierre de expedientes</string>
+          <string>Cerrar práctica</string>
          </property>
         </widget>
        </item>
@@ -86,7 +108,7 @@
     <item>
      <widget class="QStackedWidget" name="stackedWidgetCentral">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page">
        <layout class="QGridLayout" name="gridLayout_3">
@@ -138,7 +160,7 @@
         <item row="5" column="3">
          <widget class="QPushButton" name="btnEnviarTerna">
           <property name="text">
-           <string>Generar terna</string>
+           <string>Enviar Postulación</string>
           </property>
          </widget>
         </item>
@@ -258,32 +280,98 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="page_2">
-       <layout class="QGridLayout" name="gridLayout_4">
-        <item row="4" column="1">
-         <spacer name="horizontalSpacer_6">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+      <widget class="QWidget" name="page_5">
+       <layout class="QGridLayout" name="gridLayout_5">
+        <item row="1" column="0" colspan="3">
+         <widget class="QTableWidget" name="tblOfertas">
+          <property name="editTriggers">
+           <set>QAbstractItemView::NoEditTriggers</set>
           </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
+          <property name="selectionMode">
+           <enum>QAbstractItemView::SingleSelection</enum>
           </property>
-         </spacer>
+          <property name="selectionBehavior">
+           <enum>QAbstractItemView::SelectRows</enum>
+          </property>
+          <attribute name="horizontalHeaderDefaultSectionSize">
+           <number>190</number>
+          </attribute>
+          <attribute name="horizontalHeaderStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+          <column>
+           <property name="text">
+            <string>ID Oferta</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Título de la Vacante</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Empresa</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Estado</string>
+           </property>
+          </column>
+         </widget>
         </item>
-        <item row="4" column="2">
-         <widget class="QPushButton" name="btnAsignarTutor">
+        <item row="2" column="0">
+         <widget class="QPushButton" name="btnRechazarOferta">
           <property name="text">
-           <string>Confirmar asignación</string>
+           <string>Rechazar</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="1" colspan="2">
-         <widget class="QComboBox" name="cmbTutoresDisponibles">
-          <property name="editable">
-           <bool>false</bool>
+        <item row="2" column="2">
+         <widget class="QPushButton" name="btnAceptarOferta">
+          <property name="text">
+           <string>Validar</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0" colspan="3">
+         <widget class="QLabel" name="label_8">
+          <property name="font">
+           <font>
+            <family>Segoe UI</family>
+            <pointsize>14</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Ver ofertas</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="page_2">
+       <layout class="QGridLayout" name="gridLayout_4">
+        <item row="1" column="0" colspan="3">
+         <widget class="QLabel" name="label_3">
+          <property name="font">
+           <font>
+            <family>Segoe UI</family>
+            <pointsize>14</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Prácticas en ejecución pendientes de asignación de tutor docente</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
@@ -338,21 +426,30 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="0" colspan="3">
-         <widget class="QLabel" name="label_3">
-          <property name="font">
-           <font>
-            <family>Segoe UI</family>
-            <pointsize>14</pointsize>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
+        <item row="3" column="1" colspan="2">
+         <widget class="QComboBox" name="cmbTutoresDisponibles">
+          <property name="editable">
+           <bool>false</bool>
           </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <spacer name="horizontalSpacer_6">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="4" column="2">
+         <widget class="QPushButton" name="btnAsignarTutor">
           <property name="text">
-           <string>Prácticas en ejecución pendientes de asignación de tutor docente</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
+           <string>Asignar</string>
           </property>
          </widget>
         </item>
@@ -623,6 +720,7 @@
     </property>
     <addaction name="actRevisarPostulaciones"/>
     <addaction name="actGenerarTernas"/>
+    <addaction name="actRevisarOfertas"/>
    </widget>
    <widget class="QMenu" name="menu_Asignaciones">
     <property name="title">
@@ -720,6 +818,11 @@
   <action name="actEmitirOficios">
    <property name="text">
     <string>Emitir oficios</string>
+   </property>
+  </action>
+  <action name="actRevisarOfertas">
+   <property name="text">
+    <string>Revisar ofertas</string>
    </property>
   </action>
  </widget>

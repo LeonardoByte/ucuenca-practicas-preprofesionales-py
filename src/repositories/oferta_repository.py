@@ -76,7 +76,10 @@ class OfertaRepository(OfertaRepositoryABC):
 
     def listar_ofertas_disponibles(self) -> list[Oferta]:
         self._cargar_datos()
-        return list(self._datos)
+        return [
+            o for o in self._datos
+            if getattr(o, "validada_por_coordinador", False) is True and getattr(o, "activo", True) is True
+        ]
 
     def obtener_todos(self) -> list[Oferta]:
         self._cargar_datos()

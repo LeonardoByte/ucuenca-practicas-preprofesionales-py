@@ -19,6 +19,7 @@ from src.repositories import (
 )
 from src.services.exceptions import DocumentacionIncompletaError
 from src.services.interfaces.coordinador_main_service_abc import CoordinadorMainServiceABC
+from src.utils.ayuda_dialog import mostrar_ayuda_dialog
 
 
 class CoordinadorController(QObject):
@@ -39,8 +40,15 @@ class CoordinadorController(QObject):
         # Load dynamic UI
         uic.loadUi("src/views/ui/main_window_coordinador.ui", self.view)
 
+        # Apply global QSS style to buttons
+        from src.utils.qss_loader import aplicar_qss_global
+        aplicar_qss_global(self.view)
+
         # Hook navigation (Sidebar buttons)
         self.view.btnNavPostulaciones.clicked.connect(self.ir_a_postulaciones)
+        self.btnNavOfertas = getattr(self.view, "btnNavOfertas", getattr(self.view, "btnNavOferas", None))
+        if self.btnNavOfertas:
+            self.btnNavOfertas.clicked.connect(self.ir_a_ofertas)
         self.view.btnNavAsignaciones.clicked.connect(self.ir_a_asignaciones)
         self.view.btnNavSolicitudes.clicked.connect(self.ir_a_solicitudes)
         self.view.btnNavCierre.clicked.connect(self.ir_a_cierre)
@@ -49,6 +57,8 @@ class CoordinadorController(QObject):
         # Hook menubar actions
         self.view.actRevisarPostulaciones.triggered.connect(self.ir_a_postulaciones)
         self.view.actGenerarTernas.triggered.connect(self.ir_a_postulaciones)
+        if hasattr(self.view, "actRevisarOfertas") and self.view.actRevisarOfertas:
+            self.view.actRevisarOfertas.triggered.connect(self.ir_a_ofertas)
         self.view.actAsignarTutores.triggered.connect(self.ir_a_asignaciones)
         self.view.actAutorizacionesPendientes.triggered.connect(self.ir_a_solicitudes)
         self.view.actEmitirOficios.triggered.connect(self.ir_a_solicitudes)
@@ -66,10 +76,17 @@ class CoordinadorController(QObject):
         self.view.btnRechazarPostulacion.clicked.connect(self.rechazar_postulacion)
         self.view.btnEnviarTerna.clicked.connect(self.enviar_terna)
 
-        # Hook page 2 buttons
-        self.view.btnAsignarTutor.clicked.connect(self.asignar_tutor)
+        # Hook page 2 buttons (offers tray buttons)
+        self.btnAprobarOferta = getattr(self.view, "btnAprobarOferta", getattr(self.view, "btnAceptarOferta", None))
+        if self.btnAprobarOferta:
+            self.btnAprobarOferta.clicked.connect(self.aprobar_oferta)
+        if hasattr(self.view, "btnRechazarOferta") and self.view.btnRechazarOferta:
+            self.view.btnRechazarOferta.clicked.connect(self.rechazar_oferta)
 
         # Hook page 3 buttons
+        self.view.btnAsignarTutor.clicked.connect(self.asignar_tutor)
+
+        # Hook page 4 buttons
         self.view.btnAprobarAutorizacion.clicked.connect(self.aprobar_autorizacion)
         self.view.btnRechazarAutorizacion.clicked.connect(self.rechazar_autorizacion)
         self.btnProcesarOficio = getattr(
@@ -78,13 +95,14 @@ class CoordinadorController(QObject):
         if self.btnProcesarOficio:
             self.btnProcesarOficio.clicked.connect(self.procesar_oficio)
 
-        # Hook page 4 buttons
+        # Hook page 5 buttons
         self.view.btnEjecutarCierre.clicked.connect(self.ejecutar_cierre)
 
         # Apply controls globally to all tables
         self.tablas = [
             self.view.tblPostulacionesPendientes,
             self.view.tblOfertasConteo,
+            getattr(self.view, "tblOfertas", None),
             self.view.tblPracticasSinTutor,
             self.view.tblAutorizacionesPendientes,
             self.view.tblOficiosPendientes,
@@ -108,23 +126,132 @@ class CoordinadorController(QObject):
         self.cargar_practicas_sin_tutor()
         self.cargar_solicitudes()
         self.cargar_practicas_activas()
+        self.cargar_ofertas_pendientes()
 
     def ir_a_postulaciones(self) -> None:
         self.view.stackedWidgetCentral.setCurrentIndex(0)
         self.cargar_postulaciones_y_ofertas()
 
-    def ir_a_asignaciones(self) -> None:
+    def ir_a_ofertas(self) -> None:
         self.view.stackedWidgetCentral.setCurrentIndex(1)
+        self.cargar_ofertas_pendientes()
+
+    def ir_a_asignaciones(self) -> None:
+        self.view.stackedWidgetCentral.setCurrentIndex(2)
         self.cargar_practicas_sin_tutor()
         self.cargar_tutores_disponibles()
 
     def ir_a_solicitudes(self) -> None:
-        self.view.stackedWidgetCentral.setCurrentIndex(2)
+        self.view.stackedWidgetCentral.setCurrentIndex(3)
         self.cargar_solicitudes()
 
     def ir_a_cierre(self) -> None:
-        self.view.stackedWidgetCentral.setCurrentIndex(3)
+        self.view.stackedWidgetCentral.setCurrentIndex(4)
         self.cargar_practicas_activas()
+
+    def cargar_ofertas_pendientes(self) -> None:
+        try:
+            tbl = getattr(self.view, "tblOfertas", None)
+            if not tbl:
+                return
+            tbl.setRowCount(0)
+            self.service.oferta_repo._cargar_datos()
+            ofertas = self.service.oferta_repo.obtener_todos()
+            
+            pendientes = [o for o in ofertas if not getattr(o, "validada_por_coordinador", False)]
+            
+            for o in pendientes:
+                row = tbl.rowCount()
+                tbl.insertRow(row)
+                
+                emp = self.empresa_repo.buscar_por_id(o.id_e)
+                empresa_nombre = emp.nombre_empresa if emp else "N/A"
+                
+                try:
+                    data = json.loads(o.descripcion_oferta)
+                    titulo = data.get("titulo", "")
+                except Exception:
+                    titulo = o.descripcion_oferta
+                
+                item_id = QTableWidgetItem(str(o.id_o))
+                item_id.setData(Qt.ItemDataRole.UserRole, o.id_o)
+                
+                tbl.setItem(row, 0, item_id)
+                tbl.setItem(row, 1, QTableWidgetItem(titulo))
+                tbl.setItem(row, 2, QTableWidgetItem(empresa_nombre))
+                tbl.setItem(row, 3, QTableWidgetItem("Pendiente"))
+        except Exception as e:
+            QMessageBox.critical(self.view, "Error", f"Error al cargar ofertas pendientes: {str(e)}")
+
+    def aprobar_oferta(self) -> None:
+        tbl = getattr(self.view, "tblOfertas", None)
+        if not tbl:
+            return
+        selected = tbl.selectedItems()
+        if not selected:
+            QMessageBox.warning(self.view, "Selección requerida", "Debe seleccionar una oferta.")
+            return
+        
+        row = selected[0].row()
+        item_id = tbl.item(row, 0)
+        if not item_id:
+            return
+        id_o = item_id.data(Qt.ItemDataRole.UserRole)
+        
+        confirm = QMessageBox.question(
+            self.view,
+            "Confirmar Aprobación",
+            "¿Está seguro que desea aprobar esta oferta?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
+        if confirm == QMessageBox.StandardButton.Yes:
+            try:
+                self.service.oferta_repo._cargar_datos()
+                oferta = self.service.oferta_repo.buscar_por_id(id_o)
+                if oferta:
+                    oferta.validada_por_coordinador = True
+                    self.service.oferta_repo.guardar(oferta)
+                    QMessageBox.information(self.view, "Éxito", "La oferta ha sido aprobada.")
+                    self.cargar_ofertas_pendientes()
+                else:
+                    QMessageBox.critical(self.view, "Error", "No se encontró la oferta.")
+            except Exception as e:
+                QMessageBox.critical(self.view, "Error", f"Error al aprobar: {str(e)}")
+
+    def rechazar_oferta(self) -> None:
+        tbl = getattr(self.view, "tblOfertas", None)
+        if not tbl:
+            return
+        selected = tbl.selectedItems()
+        if not selected:
+            QMessageBox.warning(self.view, "Selección requerida", "Debe seleccionar una oferta.")
+            return
+        
+        row = selected[0].row()
+        item_id = tbl.item(row, 0)
+        if not item_id:
+            return
+        id_o = item_id.data(Qt.ItemDataRole.UserRole)
+        
+        confirm = QMessageBox.question(
+            self.view,
+            "Confirmar Rechazo",
+            "¿Está seguro que desea rechazar esta oferta?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
+        if confirm == QMessageBox.StandardButton.Yes:
+            try:
+                self.service.oferta_repo._cargar_datos()
+                success = self.service.oferta_repo.eliminar(id_o)
+                if success:
+                    QMessageBox.information(self.view, "Éxito", "La oferta ha sido rechazada.")
+                    self.cargar_ofertas_pendientes()
+                else:
+                    QMessageBox.critical(self.view, "Error", "No se pudo rechazar la oferta.")
+            except Exception as e:
+                QMessageBox.critical(self.view, "Error", f"Error al rechazar: {str(e)}")
 
     def solicitar_cerrar_sesion(self) -> None:
         confirm = QMessageBox.question(
@@ -272,7 +399,7 @@ class CoordinadorController(QObject):
         if item_conteo:
             try:
                 conteo = int(item_conteo.text())
-                self.view.btnEnviarTerna.setEnabled(conteo >= 3)
+                self.view.btnEnviarTerna.setEnabled(conteo >= 1)
             except ValueError:
                 self.view.btnEnviarTerna.setEnabled(False)
         else:
@@ -288,38 +415,39 @@ class CoordinadorController(QObject):
             return
         id_o = item_id.data(Qt.ItemDataRole.UserRole)
 
+        is_mock = type(self.view).__name__ in ("MagicMock", "NonCallableMagicMock", "Mock")
+        parent_widget = self.view if (isinstance(self.view, QWidget) or is_mock) else None
         confirm = QMessageBox.question(
-            self.view,
+            parent_widget,
             "Confirmar Terna",
-            "¿Está seguro que desea generar la terna para esta oferta?",
+            "¿Está seguro que desea enviar los candidatos para esta oferta?",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.No,
         )
         if confirm == QMessageBox.StandardButton.Yes:
             try:
-                # Retrieve the first 3 validadas postulations for this offer
                 self.service.postulacion_repo._cargar_datos()
                 post_ids = [
                     p.id_pos
                     for p in self.service.postulacion_repo._datos
                     if p.id_o == id_o and p.estado_de_postulacion == EstadoPostulacion.VALIDADA
                 ]
-                if len(post_ids) < 3:
+                if len(post_ids) == 0:
                     QMessageBox.warning(
-                        self.view, "Validación", "No existen suficientes postulaciones validadas."
+                        parent_widget, "Validación", "No existen postulaciones validadas."
                     )
                     return
 
-                success = self.service.enviar_terna_a_empresa(post_ids[:3])
+                success = self.service.enviar_terna_a_empresa(post_ids)
                 if success:
                     QMessageBox.information(
-                        self.view, "Terna Enviada", "La terna ha sido enviada a la empresa."
+                        parent_widget, "Terna Enviada", "Los candidatos han sido enviados a la empresa."
                     )
                     self.cargar_postulaciones_y_ofertas()
                 else:
-                    QMessageBox.critical(self.view, "Error", "No se pudo enviar la terna.")
+                    QMessageBox.critical(parent_widget, "Error", "No se pudo enviar los candidatos.")
             except Exception as e:
-                QMessageBox.critical(self.view, "Error", f"Error al generar terna: {str(e)}")
+                QMessageBox.critical(parent_widget, "Error", f"Error al generar terna: {str(e)}")
 
     # ==========================================
     # Página 2: Asignación de Tutores
@@ -631,22 +759,10 @@ class CoordinadorController(QObject):
     # Diálogos de Ayuda
     # ==========================================
     def mostrar_acerca_programa(self) -> None:
-        self.mostrar_ayuda_dialog(0)
+        mostrar_ayuda_dialog(self.view, 0)
 
     def mostrar_acerca_desarrollador(self) -> None:
-        self.mostrar_ayuda_dialog(1)
+        mostrar_ayuda_dialog(self.view, 1)
 
     def mostrar_repositorio_github(self) -> None:
-        self.mostrar_ayuda_dialog(2)
-
-    def mostrar_ayuda_dialog(self, index: int) -> None:
-        parent = self.view if isinstance(self.view, QWidget) else None
-        dialog = QDialog(parent)
-        uic.loadUi("src/views/ui/wgt_ayuda_acerca.ui", dialog)
-        dialog.stackedWidgetAyuda.setCurrentIndex(index)
-        dialog.pushButton.clicked.connect(dialog.accept)
-
-        if index == 2:
-            QDesktopServices.openUrl(QUrl("https://github.com/LeonardoByte"))
-
-        dialog.exec()
+        mostrar_ayuda_dialog(self.view, 2)

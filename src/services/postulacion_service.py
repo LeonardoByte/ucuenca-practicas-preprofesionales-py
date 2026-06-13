@@ -46,9 +46,9 @@ class PostulacionService(PostulacionServiceABC):
         return self.postulacion_repo.guardar(p)
 
     def agrupar_y_despachar_terna(self, id_postulaciones: list[int]) -> bool:
-        if len(id_postulaciones) != 3:
+        if not id_postulaciones:
             raise TernaInvalidaError(
-                "Una terna debe estar compuesta por exactamente 3 postulaciones."
+                "Debe seleccionar al menos una postulación para despachar."
             )
 
         # Cargar postulaciones usando list comprehension sin bucle for

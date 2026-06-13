@@ -522,6 +522,7 @@ def test_oferta_repository():
         fecha_de_publicacion="2026-05-01",
         duracion="6 meses",
         remuneracion=400.0,
+        validada_por_coordinador=True,
     )
     assert repo.guardar(oferta) is True
     assert (TEST_DB_DIR / "ofertas.dat").exists()
@@ -536,6 +537,7 @@ def test_oferta_repository():
         fecha_de_publicacion="2026-05-01",
         duracion="6 meses",
         remuneracion=450.0,
+        validada_por_coordinador=True,
     )
     assert repo.guardar(oferta2) is True
     assert oferta2.id_o == 2
@@ -548,6 +550,7 @@ def test_oferta_repository():
         fecha_de_publicacion="2026-05-01",
         duracion="6 meses",
         remuneracion=350.0,
+        validada_por_coordinador=True,
     )
     assert repo.guardar(oferta3) is True
     assert oferta3.id_o == 3

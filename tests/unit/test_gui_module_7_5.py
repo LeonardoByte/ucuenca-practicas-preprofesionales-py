@@ -153,26 +153,26 @@ def test_coordinador_navigation_sidebar_and_menubar(qtbot):
 
         # Sidebar navigation
         view.btnNavAsignaciones.click()
-        assert view.stackedWidgetCentral.currentIndex() == 1
-
-        view.btnNavSolicitudes.click()
         assert view.stackedWidgetCentral.currentIndex() == 2
 
-        view.btnNavCierre.click()
+        view.btnNavSolicitudes.click()
         assert view.stackedWidgetCentral.currentIndex() == 3
+
+        view.btnNavCierre.click()
+        assert view.stackedWidgetCentral.currentIndex() == 4
 
         view.btnNavPostulaciones.click()
         assert view.stackedWidgetCentral.currentIndex() == 0
 
         # Menubar trigger actions
         view.actAsignarTutores.trigger()
-        assert view.stackedWidgetCentral.currentIndex() == 1
-
-        view.actAutorizacionesPendientes.trigger()
         assert view.stackedWidgetCentral.currentIndex() == 2
 
-        view.actCierreOficial.trigger()
+        view.actAutorizacionesPendientes.trigger()
         assert view.stackedWidgetCentral.currentIndex() == 3
+
+        view.actCierreOficial.trigger()
+        assert view.stackedWidgetCentral.currentIndex() == 4
 
         view.actRevisarPostulaciones.trigger()
         assert view.stackedWidgetCentral.currentIndex() == 0
@@ -181,7 +181,7 @@ def test_coordinador_navigation_sidebar_and_menubar(qtbot):
         assert view.stackedWidgetCentral.currentIndex() == 0
 
         view.actEmitirOficios.trigger()
-        assert view.stackedWidgetCentral.currentIndex() == 2
+        assert view.stackedWidgetCentral.currentIndex() == 3
 
 
 def test_coordinador_postulaciones_loading_and_actions(qtbot):
@@ -301,9 +301,9 @@ def test_coordinador_conteo_terna_activation_and_submit(qtbot):
         # Initially button is disabled
         assert not view.btnEnviarTerna.isEnabled()
 
-        # Selection changes to row 1 (conteo = 1) -> remains disabled
+        # Selection changes to row 1 (conteo = 1) -> enabled (as 3-candidate restriction is removed)
         view.tblOfertasConteo.selectRow(1)
-        assert not view.btnEnviarTerna.isEnabled()
+        assert view.btnEnviarTerna.isEnabled()
 
         # Selection changes to row 0 (conteo = 3) -> enabled
         view.tblOfertasConteo.selectRow(0)

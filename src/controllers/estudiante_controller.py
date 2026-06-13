@@ -12,6 +12,7 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+from src.models import EstadoPracticaEstudiante
 from src.repositories import (
     ActividadRepository,
     EmpresaRepository,
@@ -24,6 +25,7 @@ from src.services.exceptions import (
     RequisitosNoCumplidosError,
 )
 from src.services.interfaces.estudiante_main_service_abc import EstudianteMainServiceABC
+from src.utils.ayuda_dialog import mostrar_ayuda_dialog
 
 
 class EstudianteController(QObject):
@@ -44,6 +46,8 @@ class EstudianteController(QObject):
         # Load dynamic UI only if base instance is a QWidget
         if isinstance(self.view, QWidget):
             uic.loadUi("src/views/ui/main_window_estudiante.ui", self.view)
+            from src.utils.qss_loader import aplicar_qss_global
+            aplicar_qss_global(self.view)
 
         # Hook navigation (Sidebar buttons)
         if hasattr(self.view, "btnNavOfertas") and self.view.btnNavOfertas:
@@ -52,6 +56,9 @@ class EstudianteController(QObject):
             self.view.btnNavPostulaciones.clicked.connect(self.ir_a_postulaciones)
         if hasattr(self.view, "btnNavSolicitar") and self.view.btnNavSolicitar:
             self.view.btnNavSolicitar.clicked.connect(self.ir_a_solicitudes)
+        self.btnNavPractica = getattr(self.view, "btnNavPractica", getattr(self.view, "pushButton", None))
+        if self.btnNavPractica:
+            self.btnNavPractica.clicked.connect(self.ir_a_practica)
         if hasattr(self.view, "btnNavBitacora") and self.view.btnNavBitacora:
             self.view.btnNavBitacora.clicked.connect(self.ir_a_bitacora)
         if hasattr(self.view, "btnNavCerrarSesion") and self.view.btnNavCerrarSesion:
@@ -64,6 +71,8 @@ class EstudianteController(QObject):
             self.view.actMisPostulaciones.triggered.connect(self.ir_a_postulaciones)
         if hasattr(self.view, "actSolicitarAutorizacion") and self.view.actSolicitarAutorizacion:
             self.view.actSolicitarAutorizacion.triggered.connect(self.ir_a_solicitudes)
+        if hasattr(self.view, "actVerPractica") and self.view.actVerPractica:
+            self.view.actVerPractica.triggered.connect(self.ir_a_practica)
         if hasattr(self.view, "actVerActividades") and self.view.actVerActividades:
             self.view.actVerActividades.triggered.connect(self.ir_a_bitacora)
         if hasattr(self.view, "actRegistrarActividad") and self.view.actRegistrarActividad:
@@ -95,6 +104,20 @@ class EstudianteController(QObject):
         )
         if self.btnGuardarActividad:
             self.btnGuardarActividad.clicked.connect(self.guardar_actividad)
+
+        # Dynamically add download/upload buttons for Formulario 1
+        if hasattr(self.view, "page_5") and self.view.page_5 and isinstance(self.view, QWidget):
+            from PyQt6.QtWidgets import QPushButton
+            self.btnDescargarForm1 = QPushButton("Descargar Plantilla F1", self.view.page_5)
+            self.btnSubirForm1 = QPushButton("Subir Formulario 1 Firmado", self.view.page_5)
+            self.view.btnDescargarForm1 = self.btnDescargarForm1
+            self.view.btnSubirForm1 = self.btnSubirForm1
+            layout = getattr(self.view, "gridLayout_5", None)
+            if layout:
+                layout.addWidget(self.btnDescargarForm1, 17, 0)
+                layout.addWidget(self.btnSubirForm1, 17, 1)
+            self.btnDescargarForm1.clicked.connect(self.descargar_plantilla_f1)
+            self.btnSubirForm1.clicked.connect(self.subir_formulario_f1)
 
         # Hook legacy actions/buttons to maintain compatibility with legacy tests
         if hasattr(self.view, "btn_nav_catalogo") and self.view.btn_nav_catalogo:
@@ -176,8 +199,187 @@ class EstudianteController(QObject):
             self.validar_y_cargar_bitacora()
         else:
             if hasattr(self.view, "stackedWidgetCentral") and self.view.stackedWidgetCentral:
-                self.view.stackedWidgetCentral.setCurrentIndex(3)
+                self.view.stackedWidgetCentral.setCurrentIndex(4)
             self.cargar_mis_actividades()
+
+    def ir_a_practica(self) -> None:
+        if hasattr(self.view, "mostrar_seccion"):
+            self.view.mostrar_seccion("practica")
+        if hasattr(self.view, "stackedWidgetCentral") and self.view.stackedWidgetCentral:
+            self.view.stackedWidgetCentral.setCurrentIndex(3)
+        self.cargar_datos_practica_activa()
+
+    def cargar_datos_practica_activa(self) -> None:
+        try:
+            pr = self.service.obtener_practica_activa_estudiante(self.estudiante_perfil.id_p)
+            if pr:
+                from src.repositories import CoordinadorRepository, TutorAcademicoRepository, TutorEmpresarialRepository, EmpresaRepository
+                coord_repo = CoordinadorRepository()
+                t_acad_repo = TutorAcademicoRepository()
+                t_emp_repo = TutorEmpresarialRepository()
+                emp_repo = EmpresaRepository()
+                
+                post = self.service.postulacion_service.buscar_postulacion_por_id(pr.id_pos)
+                
+                coord_name = "Dra. Ana Gabriela Nuñez"
+                if post and post.id_p_coordinador:
+                    coord = coord_repo.buscar_por_id(post.id_p_coordinador)
+                    if coord:
+                        coord_name = coord.nombre_y_apellido
+                
+                t_acad = t_acad_repo.buscar_por_id(pr.id_p_tutor_acad) if pr.id_p_tutor_acad != 0 else None
+                tutor_acad_name = t_acad.nombre_y_apellido if t_acad else "Sin asignar"
+                
+                t_emp = t_emp_repo.buscar_por_id(pr.id_p_tutor_emp) if pr.id_p_tutor_emp != 0 else None
+                tutor_emp_name = t_emp.nombre_y_apellido if t_emp else "Sin asignar"
+                
+                empresa_nombre = "N/A"
+                if post:
+                    emp = emp_repo.buscar_por_id(post.id_e)
+                    if emp:
+                        empresa_nombre = emp.nombre_empresa
+                
+                estado_str = str(pr.estado_de_practica.value if hasattr(pr.estado_de_practica, "value") else pr.estado_de_practica)
+                
+                if hasattr(self.view, "lbPracticanombre") and self.view.lbPracticanombre:
+                    self.view.lbPracticanombre.setText(self.estudiante_perfil.nombre_y_apellido)
+                if hasattr(self.view, "lbPracticaCoordinador") and self.view.lbPracticaCoordinador:
+                    self.view.lbPracticaCoordinador.setText(coord_name)
+                if hasattr(self.view, "lbPracticaTutorAcad") and self.view.lbPracticaTutorAcad:
+                    self.view.lbPracticaTutorAcad.setText(tutor_acad_name)
+                if hasattr(self.view, "lbPracticaTutorEmpr") and self.view.lbPracticaTutorEmpr:
+                    self.view.lbPracticaTutorEmpr.setText(tutor_emp_name)
+                if hasattr(self.view, "lbPracticaFechaIni") and self.view.lbPracticaFechaIni:
+                    self.view.lbPracticaFechaIni.setText(pr.fecha_inicio)
+                if hasattr(self.view, "lbPracticaFechaFin") and self.view.lbPracticaFechaFin:
+                    self.view.lbPracticaFechaFin.setText(pr.fecha_fin)
+                if hasattr(self.view, "lbPracticaEstado") and self.view.lbPracticaEstado:
+                    self.view.lbPracticaEstado.setText(estado_str)
+            else:
+                if hasattr(self.view, "lbPracticanombre") and self.view.lbPracticanombre:
+                    self.view.lbPracticanombre.setText(self.estudiante_perfil.nombre_y_apellido)
+                if hasattr(self.view, "lbPracticaCoordinador") and self.view.lbPracticaCoordinador:
+                    self.view.lbPracticaCoordinador.setText("N/A")
+                if hasattr(self.view, "lbPracticaTutorAcad") and self.view.lbPracticaTutorAcad:
+                    self.view.lbPracticaTutorAcad.setText("N/A")
+                if hasattr(self.view, "lbPracticaTutorEmpr") and self.view.lbPracticaTutorEmpr:
+                    self.view.lbPracticaTutorEmpr.setText("N/A")
+                if hasattr(self.view, "lbPracticaFechaIni") and self.view.lbPracticaFechaIni:
+                    self.view.lbPracticaFechaIni.setText("N/A")
+                if hasattr(self.view, "lbPracticaFechaFin") and self.view.lbPracticaFechaFin:
+                    self.view.lbPracticaFechaFin.setText("N/A")
+                if hasattr(self.view, "lbPracticaEstado") and self.view.lbPracticaEstado:
+                    self.view.lbPracticaEstado.setText("Sin práctica activa")
+        except Exception as e:
+            import sys
+            if "pytest" in sys.modules:
+                raise e
+            if hasattr(self.view, "mostrar_error"):
+                self.view.mostrar_error(f"Error al cargar información de práctica: {str(e)}")
+            else:
+                QMessageBox.critical(self.view, "Error", f"Error al cargar información de práctica: {str(e)}")
+
+    def descargar_plantilla_f1(self) -> None:
+        from PyQt6.QtWidgets import QFileDialog, QWidget
+        import shutil
+        from pathlib import Path
+        
+        dest_path, _ = QFileDialog.getSaveFileName(
+            self.view if isinstance(self.view, QWidget) else None,
+            "Guardar Plantilla Formulario 1",
+            "form_1.pdf",
+            "PDF Files (*.pdf)",
+        )
+        if dest_path:
+            src = Path("storage/documents/form_1.pdf")
+            if src.exists():
+                try:
+                    shutil.copy(src, dest_path)
+                    if hasattr(self.view, "mostrar_exito"):
+                        self.view.mostrar_exito("La plantilla fue descargada correctamente.")
+                    else:
+                        QMessageBox.information(
+                            self.view,
+                            "Descarga Exitosa",
+                            "La plantilla fue descargada correctamente."
+                        )
+                except Exception as e:
+                    QMessageBox.critical(self.view, "Error", f"Error al copiar archivo: {str(e)}")
+            else:
+                QMessageBox.critical(self.view, "Error", "No se encontró la plantilla form_1.pdf en storage/documents.")
+
+    def subir_formulario_f1(self) -> None:
+        from PyQt6.QtWidgets import QFileDialog, QWidget
+        import shutil
+        from pathlib import Path
+        from src.repositories import FormularioRepository
+        
+        pr = self.service.obtener_practica_activa_estudiante(self.estudiante_perfil.id_p)
+        if not pr:
+            QMessageBox.warning(
+                self.view,
+                "Requisito",
+                "Debe poseer una práctica activa para subir el formulario."
+            )
+            return
+            
+        src_path, _ = QFileDialog.getOpenFileName(
+            self.view if isinstance(self.view, QWidget) else None,
+            "Seleccionar Formulario 1 Firmado",
+            "",
+            "PDF Files (*.pdf)",
+        )
+        if src_path:
+            try:
+                dest_dir = Path("storage/expedientes")
+                dest_dir.mkdir(parents=True, exist_ok=True)
+                
+                dest_filename = f"{self.estudiante_perfil.correo_electronico}_form_1.pdf"
+                dest_path = dest_dir / dest_filename
+                
+                shutil.copy(src_path, dest_path)
+                
+                from src.models import TipoFormulario, EstadoFirmaFormulario, Formulario
+                from datetime import date
+                
+                form_repo = FormularioRepository()
+                form_repo._cargar_datos()
+                
+                existing_forms = form_repo.listar_formularios_por_practica(pr.id_pr)
+                form = None
+                for f in existing_forms:
+                    if f.tipo_formulario == TipoFormulario.FORMULARIO_1:
+                        form = f
+                        break
+                        
+                if not form:
+                    all_ids = [f.id_doc for f in form_repo._datos]
+                    new_id = max(all_ids) + 1 if all_ids else 1
+                    form = Formulario(
+                        id_doc=new_id,
+                        id_pr=pr.id_pr,
+                        tipo_formulario=TipoFormulario.FORMULARIO_1,
+                        estado_de_firma=EstadoFirmaFormulario.COMPLETADO,
+                        fecha_de_entrega_registro=date.today().strftime("%Y-%m-%d"),
+                        numero_formulario="FORM-01",
+                    )
+                else:
+                    form.estado_de_firma = EstadoFirmaFormulario.COMPLETADO
+                    form.fecha_de_entrega_registro = date.today().strftime("%Y-%m-%d")
+                
+                form.ruta_pdf = str(dest_path)
+                form_repo.guardar(form)
+                
+                if hasattr(self.view, "mostrar_exito"):
+                    self.view.mostrar_exito("La información fue guardada correctamente.")
+                else:
+                    QMessageBox.information(
+                        self.view,
+                        "Éxito",
+                        "La información fue guardada correctamente."
+                    )
+            except Exception as e:
+                QMessageBox.critical(self.view, "Error", f"Error al subir formulario: {str(e)}")
 
     def solicitar_cerrar_sesion(self) -> None:
         if hasattr(self.view, "confirmar_accion"):
@@ -258,6 +460,10 @@ class EstudianteController(QObject):
                 tbl.setRowHidden(row, search_text not in titulo)
 
     def postular_oferta(self) -> None:
+        if self.estudiante_perfil.estado_practica == EstadoPracticaEstudiante.ACTIVA:
+            QMessageBox.warning(self.view, "Advertencia", "El estudiante ya tiene una práctica activa.")
+            return
+
         tbl = getattr(self.view, "tblOfertasDisponibles", None)
         if not tbl:
             return
@@ -627,22 +833,11 @@ class EstudianteController(QObject):
     # Help Dialogs
     # ==========================================
     def mostrar_acerca_programa(self) -> None:
-        self.mostrar_ayuda_dialog(0)
+        mostrar_ayuda_dialog(self.view, 0)
 
     def mostrar_acerca_desarrollador(self) -> None:
-        self.mostrar_ayuda_dialog(1)
+        mostrar_ayuda_dialog(self.view, 1)
 
     def mostrar_repositorio_github(self) -> None:
-        self.mostrar_ayuda_dialog(2)
+        mostrar_ayuda_dialog(self.view, 2)
 
-    def mostrar_ayuda_dialog(self, index: int) -> None:
-        parent = self.view if isinstance(self.view, QWidget) else None
-        dialog = QDialog(parent)
-        uic.loadUi("src/views/ui/wgt_ayuda_acerca.ui", dialog)
-        dialog.stackedWidgetAyuda.setCurrentIndex(index)
-        dialog.pushButton.clicked.connect(dialog.accept)
-
-        if index == 2:
-            QDesktopServices.openUrl(QUrl("https://github.com/LeonardoByte"))
-
-        dialog.exec()

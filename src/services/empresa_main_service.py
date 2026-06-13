@@ -8,6 +8,7 @@ from src.models import (
     Postulacion,
     Practica,
     TutorEmpresarial,
+    EstadoPostulacion,
 )
 from src.repositories import ConvenioRepository, TutorEmpresarialRepository
 from src.services.interfaces.empresa_main_service_abc import EmpresaMainServiceABC
@@ -45,7 +46,7 @@ class EmpresaMainService(EmpresaMainServiceABC):
         )
 
     def visualizar_terna_recibida(self, id_terna: int) -> list[Postulacion]:
-        return self.postulacion_service.listar_por_id_terna(id_terna)
+        return [x for x in self.postulacion_service.listar_por_id_terna(id_terna) if x.estado_de_postulacion == EstadoPostulacion.VALIDADA]
 
     def seleccionar_candidato_ganador(
         self, id_pos_aceptada: int, id_p_tutor_emp: int, fecha_inicio: str, fecha_fin: str

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>500</width>
+    <width>512</width>
     <height>400</height>
    </rect>
   </property>
@@ -22,7 +22,7 @@
    <item>
     <widget class="QStackedWidget" name="stackedWidgetAyuda">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page">
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -60,7 +60,7 @@
        <item>
         <widget class="QLabel" name="label_2">
          <property name="text">
-          <string>Versión: 1.0 (Ciclo Academicp de Ajuste)</string>
+          <string>Versión: 1.0 (Ciclo Academico de Ajuste)</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>

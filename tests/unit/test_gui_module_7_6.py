@@ -15,6 +15,8 @@ def setup_estudiante_test():
     mock_service = MagicMock()
     mock_estudiante_perfil = MagicMock()
     mock_estudiante_perfil.id_p = 33
+    mock_estudiante_perfil.nombre_y_apellido = "Estudiante de Prueba"
+    mock_estudiante_perfil.correo_electronico = "estudiante@prueba.com"
 
     # Mock repos
     mock_empresa_repo = MagicMock()
@@ -114,7 +116,7 @@ def test_estudiante_navigation_sidebar_and_menubar(qtbot):
         assert view.stackedWidgetCentral.currentIndex() == 2
 
         view.btnNavBitacora.click()
-        assert view.stackedWidgetCentral.currentIndex() == 3
+        assert view.stackedWidgetCentral.currentIndex() == 4
 
         view.btnNavOfertas.click()
         assert view.stackedWidgetCentral.currentIndex() == 0
@@ -127,10 +129,10 @@ def test_estudiante_navigation_sidebar_and_menubar(qtbot):
         assert view.stackedWidgetCentral.currentIndex() == 2
 
         view.actVerActividades.trigger()
-        assert view.stackedWidgetCentral.currentIndex() == 3
+        assert view.stackedWidgetCentral.currentIndex() == 4
 
         view.actRegistrarActividad.trigger()
-        assert view.stackedWidgetCentral.currentIndex() == 3
+        assert view.stackedWidgetCentral.currentIndex() == 4
 
         view.actVerOfertas.trigger()
         assert view.stackedWidgetCentral.currentIndex() == 0
@@ -510,3 +512,173 @@ def test_estudiante_logout_and_help_dialogs(qtbot):
                 assert len(dialog_instances) == 3
                 assert dialog_instances[-1].stackedWidgetAyuda.currentIndex() == 2
                 mock_open_url.assert_called_once_with(QUrl("https://github.com/LeonardoByte"))
+
+
+def test_estudiante_practica_activa_y_pdf_workflow(qtbot):
+    mocks = setup_estudiante_test()
+    pr_act = mocks["practica_activa"]
+    pr_act.id_p_tutor_acad = 11
+    pr_act.id_p_tutor_emp = 22
+    pr_act.fecha_inicio = "2026-06-01"
+    pr_act.fecha_fin = "2026-09-01"
+    pr_act.estado_de_practica = MagicMock(value="EN_DESARROLLO")
+
+    tutor_acad = MagicMock(nombre_y_apellido="Ing. Marcos Paz")
+    tutor_emp = MagicMock(nombre_y_apellido="Dr. Carlos Slim")
+
+    with (
+        patch("src.controllers.estudiante_controller.EmpresaRepository", return_value=mocks["empresa_repo"]),
+        patch("src.controllers.estudiante_controller.OfertaRepository", return_value=mocks["oferta_repo"]),
+        patch("src.controllers.estudiante_controller.PostulacionRepository", return_value=mocks["postulacion_repo"]),
+        patch("src.controllers.estudiante_controller.ActividadRepository", return_value=mocks["actividad_repo"]),
+        patch("src.repositories.TutorAcademicoRepository") as mock_tutor_acad_repo_class,
+        patch("src.repositories.TutorEmpresarialRepository") as mock_tutor_emp_repo_class,
+    ):
+        mock_t_acad_repo = MagicMock()
+        mock_tutor_acad_repo_class.return_value = mock_t_acad_repo
+        mock_t_acad_repo.buscar_por_id.return_value = tutor_acad
+
+        mock_t_emp_repo = MagicMock()
+        mock_tutor_emp_repo_class.return_value = mock_t_emp_repo
+        mock_t_emp_repo.buscar_por_id.return_value = tutor_emp
+
+        view = MainWindow_Estudiante()
+        controller = EstudianteController(view, mocks["service"], mocks["estudiante_perfil"])
+        qtbot.addWidget(view)
+
+        # Trigger passive active practice info load
+        controller.ir_a_practica()
+
+        # Check index
+        assert view.stackedWidgetCentral.currentIndex() == 3
+
+        # Check loaded values
+        assert view.lbPracticaTutorAcad.text() == "Ing. Marcos Paz"
+        assert view.lbPracticaTutorEmpr.text() == "Dr. Carlos Slim"
+        assert view.lbPracticaFechaIni.text() == "2026-06-01"
+        assert view.lbPracticaFechaFin.text() == "2026-09-01"
+
+        # Check F1 Download
+        with patch("PyQt6.QtWidgets.QFileDialog.getSaveFileName", return_value=("/tmp/form_1.pdf", "PDF Files (*.pdf)")), \
+             patch("shutil.copy") as mock_copy, \
+             patch("pathlib.Path.exists", return_value=True), \
+             patch("src.controllers.estudiante_controller.QMessageBox.information") as mock_info, \
+             patch("src.controllers.estudiante_controller.QMessageBox.warning") as mock_warn, \
+             patch("src.controllers.estudiante_controller.QMessageBox.critical") as mock_crit:
+            view.btnDescargarForm1.click()
+            mock_copy.assert_called_once()
+            mock_info.assert_called_once()
+
+        # Check F1 Upload
+        with patch("PyQt6.QtWidgets.QFileDialog.getOpenFileName", return_value=("/tmp/signed_form_1.pdf", "PDF Files (*.pdf)")), \
+             patch("shutil.copy") as mock_copy, \
+             patch("src.repositories.FormularioRepository") as mock_form_repo_class, \
+             patch("src.controllers.estudiante_controller.QMessageBox.information") as mock_info, \
+             patch("src.controllers.estudiante_controller.QMessageBox.warning") as mock_warn, \
+             patch("src.controllers.estudiante_controller.QMessageBox.critical") as mock_crit:
+            mock_form_repo = MagicMock()
+            mock_form_repo_class.return_value = mock_form_repo
+            mock_form_repo.listar_formularios_por_practica.return_value = []
+            mock_form_repo._datos = []
+
+            view.btnSubirForm1.click()
+            mock_form_repo.guardar.assert_called_once()
+            mock_info.assert_called_once()
+
+
+def test_estudiante_catalogo_oculta_ofertas_inactivas_y_qss(qtbot):
+    from src.models import Oferta
+    o1 = Oferta(
+        id_o=301, id_e=10, descripcion_oferta="Active Offer", requisitos="None", 
+        fecha_de_publicacion="2026-06-01", duracion="3 meses", remuneracion=500.0, 
+        validada_por_coordinador=True, activo=True
+    )
+    o2 = Oferta(
+        id_o=302, id_e=10, descripcion_oferta="Inactive Offer", requisitos="None", 
+        fecha_de_publicacion="2026-06-01", duracion="3 meses", remuneracion=500.0, 
+        validada_por_coordinador=True, activo=False
+    )
+
+    mock_service = MagicMock()
+    all_offers = [o1, o2]
+    mock_service.obtener_catalogo_ofertas.side_effect = lambda x: [
+        o for o in all_offers 
+        if getattr(o, "validada_por_coordinador", False) is True and getattr(o, "activo", True) is True
+    ]
+
+    mock_profile = MagicMock(id_p=33, nombre_y_apellido="Estudiante", correo_electronico="estudiante@prueba.com")
+
+    # We patch the repositories to prevent loading real data
+    with (
+        patch("src.controllers.estudiante_controller.EmpresaRepository"),
+        patch("src.controllers.estudiante_controller.OfertaRepository"),
+        patch("src.controllers.estudiante_controller.PostulacionRepository"),
+        patch("src.controllers.estudiante_controller.ActividadRepository"),
+    ):
+        view = MainWindow_Estudiante()
+        controller = EstudianteController(view, mock_service, mock_profile)
+        qtbot.addWidget(view)
+
+        # Initial catalog has only 1 active offer
+        assert view.tblOfertasDisponibles.rowCount() == 1
+        assert view.tblOfertasDisponibles.item(0, 0).text() == "Active Offer"
+
+        # Mutate to inactive (activo = False) and reload
+        o1.activo = False
+        controller.cargar_ofertas()
+
+        # The catalog must hide/remove it immediately
+        assert view.tblOfertasDisponibles.rowCount() == 0
+
+    # Verify stylesheet is set on views of different controllers
+    with patch("PyQt6.QtWidgets.QMessageBox.critical"), \
+         patch("PyQt6.QtWidgets.QMessageBox.warning"), \
+         patch("PyQt6.QtWidgets.QMessageBox.information"):
+        # 1. Login
+        from src.controllers import LoginController
+        from src.views import LoginWindow
+        login_view = LoginWindow()
+        _ = LoginController(login_view, MagicMock())
+        assert login_view.styleSheet() != ""
+        qtbot.addWidget(login_view)
+        
+        # 2. Coordinador
+        from src.controllers import CoordinadorController
+        from src.views import MainWindow_Coordinador
+        coord_view = MainWindow_Coordinador()
+        _ = CoordinadorController(coord_view, MagicMock(), MagicMock())
+        assert coord_view.styleSheet() != ""
+        qtbot.addWidget(coord_view)
+
+        # 3. Empresa
+        from src.controllers import EmpresaController
+        from src.views import MainWindow_Empresa
+        emp_view = MainWindow_Empresa()
+        _ = EmpresaController(emp_view, MagicMock(), MagicMock())
+        assert emp_view.styleSheet() != ""
+        qtbot.addWidget(emp_view)
+
+        # 4. Tutor Academico
+        from src.controllers import TutorAcademicoController
+        from src.views import MainWindow_TutorAcademico
+        ta_view = MainWindow_TutorAcademico()
+        _ = TutorAcademicoController(ta_view, MagicMock(), MagicMock())
+        assert ta_view.styleSheet() != ""
+        qtbot.addWidget(ta_view)
+
+        # 5. Tutor Empresarial
+        from src.controllers import TutorEmpresarialController
+        from src.views import MainWindow_TutorEmpresarial
+        te_view = MainWindow_TutorEmpresarial()
+        _ = TutorEmpresarialController(te_view, MagicMock(), MagicMock())
+        assert te_view.styleSheet() != ""
+        qtbot.addWidget(te_view)
+
+        # 6. Administrador
+        from src.controllers import AdministradorController
+        from src.views import MainWindow_Administrador
+        admin_view = MainWindow_Administrador()
+        _ = AdministradorController(admin_view, MagicMock())
+        assert admin_view.styleSheet() != ""
+        qtbot.addWidget(admin_view)
+

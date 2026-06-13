@@ -20,6 +20,10 @@ class LoginController(QObject):
         # Load the dynamic UI
         uic.loadUi("src/views/ui/frm_login.ui", self.view)
 
+        # Apply global QSS style to buttons
+        from src.utils.qss_loader import aplicar_qss_global
+        aplicar_qss_global(self.view)
+
         # Connect signals
         self.view.btnIngresar.clicked.connect(self.procesar_login)
 

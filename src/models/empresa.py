@@ -43,6 +43,8 @@ class Oferta:
         fecha_de_publicacion: str,
         duracion: str,
         remuneracion: float,
+        validada_por_coordinador: bool = False,
+        activo: bool = True,
     ):
         self.id_o = id_o
         self.id_e = id_e
@@ -51,3 +53,5 @@ class Oferta:
         self.fecha_de_publicacion = fecha_de_publicacion
         self.duracion = duracion
         self.remuneracion = remuneracion
+        self.validada_por_coordinador = validada_por_coordinador
+        self.activo = activo

@@ -654,7 +654,8 @@ def test_tutor_academico_controller_evaluar_f2_temprana(qapp):
     mock_view.tblEstudiantes.item.return_value = table_item
 
     practica = MagicMock()
-    practica.fecha_fin = "2026-06-15"
+    from datetime import timedelta
+    practica.fecha_fin = (date.today() + timedelta(days=10)).strftime("%Y-%m-%d")
     mock_service.practica_service.practica_repo.buscar_por_id.return_value = practica
     mock_service.obtener_practicas_tutor_acad.return_value = []
 
@@ -874,10 +875,7 @@ def test_coordinador_controller_enviar_terna_invalida(qapp):
     item_id.data.return_value = 999
     mock_view.tblOfertasConteo.item.return_value = item_id
 
-    mock_service.postulacion_repo._datos = [
-        MagicMock(id_pos=1, id_o=999, estado_de_postulacion=EstadoPostulacion.VALIDADA),
-        MagicMock(id_pos=2, id_o=999, estado_de_postulacion=EstadoPostulacion.VALIDADA),
-    ]
+    mock_service.postulacion_repo._datos = []
 
     coordinador_perfil = MagicMock()
 
@@ -890,7 +888,7 @@ def test_coordinador_controller_enviar_terna_invalida(qapp):
     ), patch("src.controllers.coordinador_controller.QMessageBox.warning") as mock_warn:
         _controller.enviar_terna()
         mock_warn.assert_called_once_with(
-            mock_view, "Validación", "No existen suficientes postulaciones validadas."
+            mock_view, "Validación", "No existen postulaciones validadas."
         )
         mock_service.enviar_terna_a_empresa.assert_not_called()
 

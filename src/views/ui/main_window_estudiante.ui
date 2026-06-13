@@ -51,6 +51,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="pushButton">
+         <property name="text">
+          <string>Mi práctica</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="btnNavBitacora">
          <property name="text">
           <string>Bitácora</string>
@@ -83,7 +90,7 @@
     <item>
      <widget class="QStackedWidget" name="stackedWidgetCentral">
       <property name="currentIndex">
-       <number>3</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page">
        <layout class="QGridLayout" name="gridLayout">
@@ -248,25 +255,41 @@
       </widget>
       <widget class="QWidget" name="page_4">
        <layout class="QGridLayout" name="gridLayout_3">
-        <item row="5" column="0">
-         <widget class="QLabel" name="label_6">
-          <property name="text">
-           <string>Detalles de la empres</string>
+        <item row="0" column="0" colspan="4">
+         <spacer name="verticalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
           </property>
-         </widget>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="2" column="0" colspan="4">
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
         </item>
         <item row="3" column="1">
          <widget class="QLineEdit" name="txtNombreEmpresa"/>
         </item>
-        <item row="7" column="3">
-         <widget class="QPushButton" name="btnEnviarSolicitud">
+        <item row="5" column="0">
+         <widget class="QLabel" name="label_6">
           <property name="text">
-           <string>Enviar Solicitud</string>
+           <string>Detalles de la empresa:</string>
           </property>
          </widget>
-        </item>
-        <item row="5" column="1">
-         <widget class="QLineEdit" name="txtDetallesEmpresa"/>
         </item>
         <item row="3" column="0">
          <widget class="QLabel" name="label_5">
@@ -293,20 +316,17 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
-         <spacer name="verticalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
+        <item row="5" column="1">
+         <widget class="QLineEdit" name="txtDetallesEmpresa"/>
         </item>
-        <item row="4" column="1">
+        <item row="7" column="3">
+         <widget class="QPushButton" name="btnEnviarSolicitud">
+          <property name="text">
+           <string>Enviar Solicitud</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0" colspan="4">
          <spacer name="verticalSpacer_5">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -319,7 +339,7 @@
           </property>
          </spacer>
         </item>
-        <item row="6" column="1">
+        <item row="6" column="0" colspan="4">
          <spacer name="verticalSpacer_4">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -332,8 +352,19 @@
           </property>
          </spacer>
         </item>
-        <item row="0" column="0" colspan="3">
-         <spacer name="verticalSpacer_3">
+       </layout>
+      </widget>
+      <widget class="QWidget" name="page_5">
+       <layout class="QGridLayout" name="gridLayout_5">
+        <item row="5" column="1">
+         <widget class="QLabel" name="lbPracticaCoordinador">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0" colspan="2">
+         <spacer name="verticalSpacer_10">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
@@ -344,6 +375,219 @@
            </size>
           </property>
          </spacer>
+        </item>
+        <item row="8" column="0" colspan="2">
+         <spacer name="verticalSpacer_11">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="10" column="0" colspan="2">
+         <spacer name="verticalSpacer_12">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="3" column="1">
+         <widget class="QLabel" name="lbPracticanombre">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="14" column="0" colspan="2">
+         <spacer name="verticalSpacer_14">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="12" column="0" colspan="2">
+         <spacer name="verticalSpacer_13">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="7" column="1">
+         <widget class="QLabel" name="lbPracticaTutorAcad">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QLabel" name="label_11">
+          <property name="text">
+           <string>Coordinador:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_10">
+          <property name="text">
+           <string>Nombre:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="3">
+         <widget class="QLabel" name="label_9">
+          <property name="font">
+           <font>
+            <family>Segoe UI</family>
+            <pointsize>14</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Ver mi práctica</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="15" column="0">
+         <widget class="QLabel" name="label_16">
+          <property name="text">
+           <string>Estado:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="0">
+         <widget class="QLabel" name="label_12">
+          <property name="text">
+           <string>Tutor académico:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0" colspan="2">
+         <spacer name="verticalSpacer_7">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="9" column="0">
+         <widget class="QLabel" name="label_13">
+          <property name="text">
+           <string>Tutor empresarial:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="13" column="0">
+         <widget class="QLabel" name="label_15">
+          <property name="text">
+           <string>Fecha fin:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="0">
+         <widget class="QLabel" name="label_14">
+          <property name="text">
+           <string>Fecha inicio:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" colspan="2">
+         <spacer name="verticalSpacer_6">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="16" column="0" colspan="2">
+         <spacer name="verticalSpacer_8">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="4" column="0" colspan="2">
+         <spacer name="verticalSpacer_9">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="11" column="1">
+         <widget class="QLabel" name="lbPracticaFechaIni">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="1">
+         <widget class="QLabel" name="lbPracticaTutorEmpr">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="13" column="1">
+         <widget class="QLabel" name="lbPracticaFechaFin">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="15" column="1">
+         <widget class="QLabel" name="lbPracticaEstado">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -434,7 +678,7 @@
      <x>0</x>
      <y>0</y>
      <width>1000</width>
-     <height>31</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_Convocatorias">
@@ -452,8 +696,9 @@
    </widget>
    <widget class="QMenu" name="menu_Bit_cora">
     <property name="title">
-     <string>&amp;Bitácora</string>
+     <string>&amp;Práctica </string>
     </property>
+    <addaction name="actVerPractica"/>
     <addaction name="actVerActividades"/>
     <addaction name="actRegistrarActividad"/>
    </widget>
@@ -528,6 +773,11 @@
   <action name="actRepositorioGithub">
    <property name="text">
     <string>Repositorio GitHub</string>
+   </property>
+  </action>
+  <action name="actVerPractica">
+   <property name="text">
+    <string>Ver práctica </string>
    </property>
   </action>
  </widget>

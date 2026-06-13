@@ -68,7 +68,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Auditoría de Cuentas</string>
+            <string>Auditar Cuenta</string>
            </property>
           </widget>
          </item>
@@ -167,16 +167,12 @@
           <item>
            <widget class="QStackedWidget" name="stackedWidgetFormularios">
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="page_3">
              <layout class="QGridLayout" name="gridLayout">
-              <item row="0" column="0">
-               <widget class="QLabel" name="label">
-                <property name="text">
-                 <string>Nombres y Apellidos:</string>
-                </property>
-               </widget>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="txtEstudianteCedula"/>
               </item>
               <item row="0" column="1">
                <widget class="QLineEdit" name="txtEstudianteNombre"/>
@@ -188,9 +184,6 @@
                 </property>
                </widget>
               </item>
-              <item row="1" column="1">
-               <widget class="QLineEdit" name="txtEstudianteCedula"/>
-              </item>
               <item row="2" column="0">
                <widget class="QLabel" name="label_3">
                 <property name="text">
@@ -198,13 +191,10 @@
                 </property>
                </widget>
               </item>
-              <item row="2" column="1">
-               <widget class="QLineEdit" name="txtEstudianteCorreo"/>
-              </item>
-              <item row="3" column="0">
-               <widget class="QLabel" name="label_4">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label">
                 <property name="text">
-                 <string>Dirección:</string>
+                 <string>Nombres y Apellidos:</string>
                 </property>
                </widget>
               </item>
@@ -218,6 +208,9 @@
                 </property>
                </widget>
               </item>
+              <item row="2" column="1">
+               <widget class="QLineEdit" name="txtEstudianteCorreo"/>
+              </item>
               <item row="4" column="1">
                <widget class="QSpinBox" name="sbxEstudianteCiclo">
                 <property name="enabled">
@@ -228,6 +221,13 @@
                 </property>
                 <property name="maximum">
                  <number>10</number>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_4">
+                <property name="text">
+                 <string>Dirección:</string>
                 </property>
                </widget>
               </item>
@@ -252,10 +252,33 @@
                 </item>
                </widget>
               </item>
+              <item row="6" column="0">
+               <widget class="QLabel" name="label_23">
+                <property name="text">
+                 <string>Contraseña:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="1">
+               <widget class="QLineEdit" name="txtEstudianteContrasenha"/>
+              </item>
              </layout>
             </widget>
             <widget class="QWidget" name="page_4">
              <layout class="QGridLayout" name="gridLayout_2">
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_10">
+                <property name="text">
+                 <string>Dirección:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLineEdit" name="txtPersonalDireccion"/>
+              </item>
+              <item row="2" column="1">
+               <widget class="QLineEdit" name="txtPersonalCorreo"/>
+              </item>
               <item row="0" column="0">
                <widget class="QLabel" name="label_7">
                 <property name="text">
@@ -265,6 +288,13 @@
               </item>
               <item row="0" column="1">
                <widget class="QLineEdit" name="txtPersonalNombre"/>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_9">
+                <property name="text">
+                 <string>Correo Electrónico:</string>
+                </property>
+               </widget>
               </item>
               <item row="1" column="0">
                <widget class="QLabel" name="label_8">
@@ -276,49 +306,32 @@
               <item row="1" column="1">
                <widget class="QLineEdit" name="txtPersonalCedula"/>
               </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="label_9">
+              <item row="4" column="0">
+               <widget class="QLabel" name="label_22">
                 <property name="text">
-                 <string>Correo Electrónico:</string>
+                 <string>Contraseña:</string>
                 </property>
                </widget>
               </item>
-              <item row="2" column="1">
-               <widget class="QLineEdit" name="txtPersonalCorreo"/>
-              </item>
-              <item row="3" column="0">
-               <widget class="QLabel" name="label_10">
-                <property name="text">
-                 <string>Dirección:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="1">
-               <widget class="QLineEdit" name="txtPersonalDireccion"/>
+              <item row="4" column="1">
+               <widget class="QLineEdit" name="txtPersonalContrasenha"/>
               </item>
              </layout>
             </widget>
             <widget class="QWidget" name="page_5">
              <layout class="QGridLayout" name="gridLayout_3">
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="txtTutorEmpCedula"/>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="txtTutorEmpNombre"/>
+              </item>
               <item row="0" column="0">
                <widget class="QLabel" name="label_11">
                 <property name="text">
                  <string>Nombres y Apellidos:</string>
                 </property>
                </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QLineEdit" name="txtTutorEmpNombre"/>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label_12">
-                <property name="text">
-                 <string>Cédula / DNI:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QLineEdit" name="txtTutorEmpCedula"/>
               </item>
               <item row="2" column="0">
                <widget class="QLabel" name="label_13">
@@ -327,8 +340,29 @@
                 </property>
                </widget>
               </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_12">
+                <property name="text">
+                 <string>Cédula / DNI:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QComboBox" name="cmbTutorEmpEmpresa">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
               <item row="2" column="1">
                <widget class="QLineEdit" name="txtTutorEmpCorreo"/>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="label_15">
+                <property name="text">
+                 <string>Empresa Asignada:</string>
+                </property>
+               </widget>
               </item>
               <item row="3" column="0">
                <widget class="QLabel" name="label_14">
@@ -340,31 +374,20 @@
               <item row="3" column="1">
                <widget class="QLineEdit" name="txtTutorEmpDireccion"/>
               </item>
-              <item row="4" column="0">
-               <widget class="QLabel" name="label_15">
+              <item row="5" column="0">
+               <widget class="QLabel" name="label_24">
                 <property name="text">
-                 <string>Empresa Asignada:</string>
+                 <string>Contraseña:</string>
                 </property>
                </widget>
               </item>
-              <item row="4" column="1">
-               <widget class="QComboBox" name="cmbTutorEmpEmpresa">
-                <property name="enabled">
-                 <bool>true</bool>
-                </property>
-               </widget>
+              <item row="5" column="1">
+               <widget class="QLineEdit" name="cmbTutorEmpContrsenha"/>
               </item>
              </layout>
             </widget>
             <widget class="QWidget" name="page_6">
              <layout class="QGridLayout" name="gridLayout_4">
-              <item row="0" column="0">
-               <widget class="QLabel" name="label_16">
-                <property name="text">
-                 <string>Nombre de la Empresa:</string>
-                </property>
-               </widget>
-              </item>
               <item row="0" column="1">
                <widget class="QLineEdit" name="txtEmpresaNombre"/>
               </item>
@@ -372,6 +395,13 @@
                <widget class="QLabel" name="label_17">
                 <property name="text">
                  <string>Correo Electrónico:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_16">
+                <property name="text">
+                 <string>Nombre de la Empresa:</string>
                 </property>
                </widget>
               </item>
@@ -398,6 +428,16 @@
                  </property>
                 </item>
                </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_25">
+                <property name="text">
+                 <string>Contraseña:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLineEdit" name="txtEmpresaContrasenha"/>
               </item>
              </layout>
             </widget>
@@ -426,7 +466,7 @@
              <enum>QAbstractItemView::SelectRows</enum>
             </property>
             <attribute name="horizontalHeaderDefaultSectionSize">
-             <number>240</number>
+             <number>253</number>
             </attribute>
             <attribute name="horizontalHeaderStretchLastSection">
              <bool>true</bool>
@@ -443,7 +483,7 @@
             </column>
             <column>
              <property name="text">
-              <string>ID de usuario</string>
+              <string>ID según rol de usuario</string>
              </property>
             </column>
            </widget>
@@ -568,6 +608,38 @@
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>btnNavIngresarUsuario</tabstop>
+  <tabstop>btnNavEliminarUsuario</tabstop>
+  <tabstop>btnNavCerrarSesion</tabstop>
+  <tabstop>cmbTipoUsuario</tabstop>
+  <tabstop>txtEstudianteNombre</tabstop>
+  <tabstop>txtEstudianteCedula</tabstop>
+  <tabstop>txtEstudianteCorreo</tabstop>
+  <tabstop>txtEstudianteDireccion</tabstop>
+  <tabstop>sbxEstudianteCiclo</tabstop>
+  <tabstop>comboBox</tabstop>
+  <tabstop>txtEstudianteContrasenha</tabstop>
+  <tabstop>txtPersonalNombre</tabstop>
+  <tabstop>txtPersonalCedula</tabstop>
+  <tabstop>txtPersonalCorreo</tabstop>
+  <tabstop>txtPersonalDireccion</tabstop>
+  <tabstop>txtPersonalContrasenha</tabstop>
+  <tabstop>txtTutorEmpNombre</tabstop>
+  <tabstop>txtTutorEmpCedula</tabstop>
+  <tabstop>txtTutorEmpCorreo</tabstop>
+  <tabstop>txtTutorEmpDireccion</tabstop>
+  <tabstop>cmbTutorEmpEmpresa</tabstop>
+  <tabstop>cmbTutorEmpContrsenha</tabstop>
+  <tabstop>txtEmpresaNombre</tabstop>
+  <tabstop>txtEmpresaCorreo</tabstop>
+  <tabstop>comboBox_2</tabstop>
+  <tabstop>txtEmpresaContrasenha</tabstop>
+  <tabstop>btnCrearUsuario</tabstop>
+  <tabstop>btnEliminarUsuario</tabstop>
+  <tabstop>tableWidget</tabstop>
+  <tabstop>txtBusquedaCorreo</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

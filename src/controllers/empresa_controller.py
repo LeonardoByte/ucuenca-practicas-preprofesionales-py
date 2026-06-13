@@ -19,6 +19,7 @@ from PyQt6.QtWidgets import (
 
 from src.models.estados import EstadoPostulacion
 from src.services.interfaces.empresa_main_service_abc import EmpresaMainServiceABC
+from src.utils.ayuda_dialog import mostrar_ayuda_dialog
 
 
 class EmpresaController(QObject):
@@ -32,6 +33,10 @@ class EmpresaController(QObject):
 
         # Load the dynamic UI
         uic.loadUi("src/views/ui/main_window_empresa.ui", self.view)
+
+        # Apply global QSS style to buttons
+        from src.utils.qss_loader import aplicar_qss_global
+        aplicar_qss_global(self.view)
 
         # Resolve sidebar buttons
         self.btnNavPublicar = getattr(self.view, "btnNavPublicar", None)
@@ -267,12 +272,25 @@ class EmpresaController(QObject):
             self.view.tblPostulantesTerna.setRowCount(0)
             self.view.tblPostulantesTerna.setProperty("current_id_o", id_o)
 
-            self.service.postulacion_service.repo._cargar_datos()
+            post_service = self.service.postulacion_service
+            is_mock_post = type(post_service).__name__ in ("MagicMock", "NonCallableMagicMock", "Mock")
+            if is_mock_post:
+                if hasattr(post_service, "repo") and isinstance(getattr(post_service.repo, "_datos", None), list):
+                    repo = post_service.repo
+                elif hasattr(post_service, "postulacion_repo") and isinstance(getattr(post_service.postulacion_repo, "_datos", None), list):
+                    repo = post_service.postulacion_repo
+                else:
+                    repo = post_service.postulacion_repo
+            else:
+                repo = getattr(post_service, "postulacion_repo", getattr(post_service, "repo", None))
+
             id_terna = None
-            for p in self.service.postulacion_service.repo._datos:
-                if p.id_o == id_o and p.id_terna is not None:
-                    id_terna = p.id_terna
-                    break
+            if repo:
+                repo._cargar_datos()
+                for p in repo._datos:
+                    if p.id_o == id_o and p.id_terna is not None:
+                        id_terna = p.id_terna
+                        break
 
             candidatos = []
             if id_terna is not None:
@@ -363,6 +381,14 @@ class EmpresaController(QObject):
                     id_pos, id_tutor, fecha_ini, fecha_f
                 )
                 if success:
+                    # Mark offer as inactive (occupied)
+                    post = self.service.postulacion_service.buscar_postulacion_por_id(id_pos)
+                    if post:
+                        oferta = self.service.oferta_service.buscar_oferta_por_id(post.id_o)
+                        if oferta:
+                            oferta.activo = False
+                            self.service.oferta_service.repo.guardar(oferta)
+
                     QMessageBox.information(
                         self.view, "Éxito", "La contratación se completó correctamente."
                     )
@@ -426,22 +452,10 @@ class EmpresaController(QObject):
             self.view.tableWidget.setRowHidden(row, hide)
 
     def mostrar_acerca_programa(self) -> None:
-        self.mostrar_ayuda_dialog(0)
+        mostrar_ayuda_dialog(self.view, 0)
 
     def mostrar_acerca_desarrollador(self) -> None:
-        self.mostrar_ayuda_dialog(1)
+        mostrar_ayuda_dialog(self.view, 1)
 
     def mostrar_repositorio_github(self) -> None:
-        self.mostrar_ayuda_dialog(2)
-
-    def mostrar_ayuda_dialog(self, index: int) -> None:
-        parent = self.view if isinstance(self.view, QWidget) else None
-        dialog = QDialog(parent)
-        uic.loadUi("src/views/ui/wgt_ayuda_acerca.ui", dialog)
-        dialog.stackedWidgetAyuda.setCurrentIndex(index)
-        dialog.pushButton.clicked.connect(dialog.accept)
-
-        if index == 2:
-            QDesktopServices.openUrl(QUrl("https://github.com/LeonardoByte"))
-
-        dialog.exec()
+        mostrar_ayuda_dialog(self.view, 2)

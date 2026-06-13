@@ -282,7 +282,8 @@ def test_tutor_academico_formulario2_zero_trust(qtbot):
     # Case 1: Early evaluation check (more than 7 days left) -> warning popup & disabled
     practica_early = MagicMock()
     # 2026-06-15 is > 7 days from today (2026-06-01)
-    practica_early.fecha_fin = "2026-06-15"
+    from datetime import timedelta
+    practica_early.fecha_fin = (date.today() + timedelta(days=10)).strftime("%Y-%m-%d")
     mock_service.practica_service.practica_repo.buscar_por_id.return_value = practica_early
 
     with patch("src.controllers.tutor_academico_controller.QMessageBox.warning") as mock_warning:

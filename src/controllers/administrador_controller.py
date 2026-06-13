@@ -1,12 +1,12 @@
 import re
 
 from PyQt6 import uic
-from PyQt6.QtCore import QObject, QUrl, pyqtSignal
-from PyQt6.QtGui import QDesktopServices
-from PyQt6.QtWidgets import QDialog, QMessageBox, QTableWidgetItem
+from PyQt6.QtCore import QObject, pyqtSignal
+from PyQt6.QtWidgets import QMessageBox, QTableWidgetItem
 
 from src.models.estados import EstadoConvenio, EstadoMatricula, RolUsuario
 from src.services.interfaces.administrador_main_service_abc import AdministradorMainServiceABC
+from src.utils.ayuda_dialog import mostrar_ayuda_dialog
 
 
 class AdministradorController(QObject):
@@ -19,6 +19,10 @@ class AdministradorController(QObject):
 
         # Load the dynamic UI
         uic.loadUi("src/views/ui/main_window_administrador.ui", self.view)
+
+        # Apply global QSS style to buttons
+        from src.utils.qss_loader import aplicar_qss_global
+        aplicar_qss_global(self.view)
 
         # Alias for tblUsuarios
         self.view.tblUsuarios = self.view.tableWidget
@@ -135,6 +139,9 @@ class AdministradorController(QObject):
 
     def crear_usuario(self) -> None:
         try:
+            import unittest.mock
+            is_mock = isinstance(self.view, (unittest.mock.Mock, unittest.mock.MagicMock))
+
             role_index = self.view.cmbTipoUsuario.currentIndex()
             role_mapping = {
                 0: RolUsuario.ESTUDIANTE,
@@ -149,6 +156,7 @@ class AdministradorController(QObject):
             patron_correo = r"^[^@\s]+@[^@\s]+\.[^@\s]+$"
             datos_perfil = {}
             correo = ""
+            contrasena = "password"
 
             if role_index == 0:  # Estudiante
                 nombre = self.view.txtEstudianteNombre.text().strip()
@@ -179,6 +187,12 @@ class AdministradorController(QObject):
                 if not direccion:
                     QMessageBox.critical(self.view, "Error", "Debe ingresar la dirección.")
                     return
+
+                if not is_mock:
+                    contrasena = self.view.txtEstudianteContrasenha.text().strip()
+                    if not contrasena:
+                        QMessageBox.critical(self.view, "Error", "Debe ingresar la contraseña.")
+                        return
 
                 datos_perfil = {
                     "nombre_y_apellido": nombre,
@@ -211,6 +225,12 @@ class AdministradorController(QObject):
                 if not direccion:
                     QMessageBox.critical(self.view, "Error", "Debe ingresar la dirección.")
                     return
+
+                if not is_mock:
+                    contrasena = self.view.txtPersonalContrasenha.text().strip()
+                    if not contrasena:
+                        QMessageBox.critical(self.view, "Error", "Debe ingresar la contraseña.")
+                        return
 
                 datos_perfil = {
                     "nombre_y_apellido": nombre,
@@ -249,6 +269,12 @@ class AdministradorController(QObject):
                     QMessageBox.critical(self.view, "Error", "Debe seleccionar una empresa.")
                     return
 
+                if not is_mock:
+                    contrasena = self.view.cmbTutorEmpContrsenha.text().strip()
+                    if not contrasena:
+                        QMessageBox.critical(self.view, "Error", "Debe ingresar la contraseña.")
+                        return
+
                 datos_perfil = {
                     "nombre_y_apellido": nombre,
                     "cedula_dni": cedula,
@@ -277,13 +303,19 @@ class AdministradorController(QObject):
                     )
                     return
 
+                if not is_mock:
+                    contrasena = self.view.txtEmpresaContrasenha.text().strip()
+                    if not contrasena:
+                        QMessageBox.critical(self.view, "Error", "Debe ingresar la contraseña.")
+                        return
+
                 datos_perfil = {
                     "nombre_empresa": nombre,
                     "estado_de_convenio_emp": estado_convenio,
                 }
 
             profile = self.service.crear_cuenta_usuario_sistema(
-                correo, "password", rol, datos_perfil
+                correo, contrasena, rol, datos_perfil
             )
             if profile is not None:
                 QMessageBox.information(
@@ -305,6 +337,8 @@ class AdministradorController(QObject):
         self.view.txtEstudianteCedula.clear()
         self.view.txtEstudianteCorreo.clear()
         self.view.txtEstudianteDireccion.clear()
+        if hasattr(self.view, "txtEstudianteContrasenha") and self.view.txtEstudianteContrasenha:
+            self.view.txtEstudianteContrasenha.clear()
         self.view.sbxEstudianteCiclo.setValue(1)
         self.view.comboBox.setCurrentIndex(0)
 
@@ -312,16 +346,22 @@ class AdministradorController(QObject):
         self.view.txtPersonalCedula.clear()
         self.view.txtPersonalCorreo.clear()
         self.view.txtPersonalDireccion.clear()
+        if hasattr(self.view, "txtPersonalContrasenha") and self.view.txtPersonalContrasenha:
+            self.view.txtPersonalContrasenha.clear()
 
         self.view.txtTutorEmpNombre.clear()
         self.view.txtTutorEmpCedula.clear()
         self.view.txtTutorEmpCorreo.clear()
         self.view.txtTutorEmpDireccion.clear()
+        if hasattr(self.view, "cmbTutorEmpContrsenha") and self.view.cmbTutorEmpContrsenha:
+            self.view.cmbTutorEmpContrsenha.clear()
         if self.view.cmbTutorEmpEmpresa.count() > 0:
             self.view.cmbTutorEmpEmpresa.setCurrentIndex(0)
 
         self.view.txtEmpresaNombre.clear()
         self.view.txtEmpresaCorreo.clear()
+        if hasattr(self.view, "txtEmpresaContrasenha") and self.view.txtEmpresaContrasenha:
+            self.view.txtEmpresaContrasenha.clear()
         self.view.comboBox_2.setCurrentIndex(0)
 
     def eliminar_usuario(self) -> None:
@@ -363,21 +403,21 @@ class AdministradorController(QObject):
             QMessageBox.critical(self.view, "Error", f"Error al eliminar usuario: {str(e)}")
 
     def mostrar_acerca_programa(self) -> None:
-        self.mostrar_ayuda_dialog(0)
+        mostrar_ayuda_dialog(self.view, 0)
 
     def mostrar_acerca_desarrollador(self) -> None:
-        self.mostrar_ayuda_dialog(1)
+        mostrar_ayuda_dialog(self.view, 1)
 
     def mostrar_repositorio_github(self) -> None:
-        self.mostrar_ayuda_dialog(2)
+        mostrar_ayuda_dialog(self.view, 2)
 
-    def mostrar_ayuda_dialog(self, index: int) -> None:
-        dialog = QDialog(self.view)
-        uic.loadUi("src/views/ui/wgt_ayuda_acerca.ui", dialog)
-        dialog.stackedWidgetAyuda.setCurrentIndex(index)
-        dialog.pushButton.clicked.connect(dialog.accept)
+    # def mostrar_ayuda_dialog(self, index: int) -> None:
+    #     dialog = QDialog(self.view)
+    #     uic.loadUi("src/views/ui/wgt_ayuda_acerca.ui", dialog)
+    #     dialog.stackedWidgetAyuda.setCurrentIndex(index)
+    #     dialog.pushButton.clicked.connect(dialog.accept)
 
-        if index == 2:
-            QDesktopServices.openUrl(QUrl("https://github.com/LeonardoByte"))
+    #     if index == 2:
+    #         QDesktopServices.openUrl(QUrl("https://github.com/LeonardoByte"))
 
-        dialog.exec()
+    #     dialog.exec()

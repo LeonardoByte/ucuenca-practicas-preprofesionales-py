@@ -56,7 +56,11 @@ class EstudianteMainService(EstudianteMainServiceABC):
                 "El estudiante no cumple con el ciclo mínimo requerido (>= 6)."
             )
 
-        ofertas = self.oferta_service.listar_todas_las_ofertas()
+        # Restrict catalog to validated and active offers
+        ofertas = [
+            o for o in self.oferta_service.listar_todas_las_ofertas()
+            if getattr(o, "validada_por_coordinador", False) is True and getattr(o, "activo", True) is True
+        ]
 
         # El estudiante no tiene experiencia si estado_practica no es FINALIZADA
         has_no_experience = est.estado_practica != EstadoPracticaEstudiante.FINALIZADA
@@ -160,9 +164,13 @@ class EstudianteMainService(EstudianteMainServiceABC):
 
     def obtener_mis_postulaciones(self, id_p_estudiante: int) -> list[Postulacion]:
         self.postulacion_service.postulacion_repo._cargar_datos()
-        return [
-            p for p in self.postulacion_service.postulacion_repo._datos
-            if p.id_p_estudiante == id_p_estudiante
-        ]
+        self.oferta_service.repo._cargar_datos()
+        res = []
+        for p in self.postulacion_service.postulacion_repo._datos:
+            if p.id_p_estudiante == id_p_estudiante:
+                oferta = self.oferta_service.buscar_oferta_por_id(p.id_o)
+                if oferta and getattr(oferta, "validada_por_coordinador", False) is True:
+                    res.append(p)
+        return res
 
 

@@ -124,6 +124,12 @@
       <property name="text">
        <string>INGRESAR</string>
       </property>
+      <property name="autoDefault">
+       <bool>true</bool>
+      </property>
+      <property name="default">
+       <bool>true</bool>
+      </property>
      </widget>
     </item>
    </layout>

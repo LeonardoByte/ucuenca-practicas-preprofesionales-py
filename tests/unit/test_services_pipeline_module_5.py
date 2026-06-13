@@ -227,10 +227,16 @@ def test_estudiante_catalogo_prioridad_sin_experiencia():
         rol=RolUsuario.ESTUDIANTE,
         datos_perfil={"nombre_y_apellido": "Est NoExp", "ciclo_actual": 6, "historial_practicas": "Ninguno"}
     )
-    # Registrar ofertas
-    emp_service.registrar_oferta(1, "Oferta 1", "Req", "2026-05-01", "3 meses", 200.0)
-    emp_service.registrar_oferta(1, "Oferta 2", "Req", "2026-05-01", "3 meses", 500.0)
-    emp_service.registrar_oferta(1, "Oferta 3", "Req", "2026-05-01", "3 meses", 350.0)
+    # Registrar ofertas y validarlas por coordinador
+    o1 = emp_service.registrar_oferta(1, "Oferta 1", "Req", "2026-05-01", "3 meses", 200.0)
+    o2 = emp_service.registrar_oferta(1, "Oferta 2", "Req", "2026-05-01", "3 meses", 500.0)
+    o3 = emp_service.registrar_oferta(1, "Oferta 3", "Req", "2026-05-01", "3 meses", 350.0)
+    o1.validada_por_coordinador = True
+    o2.validada_por_coordinador = True
+    o3.validada_por_coordinador = True
+    emp_service.oferta_service.repo.guardar(o1)
+    emp_service.oferta_service.repo.guardar(o2)
+    emp_service.oferta_service.repo.guardar(o3)
 
     catalogo = est_service.obtener_catalogo_ofertas(est.id_p)
     # Sin experiencia ordena por remuneración DESC: 500 -> 350 -> 200
@@ -253,10 +259,16 @@ def test_estudiante_catalogo_prioridad_con_experiencia():
             "estado_practica": EstadoPracticaEstudiante.FINALIZADA
         }
     )
-    # Registrar ofertas
-    emp_service.registrar_oferta(1, "Oferta 1", "Req", "2026-05-01", "3 meses", 200.0)
-    emp_service.registrar_oferta(1, "Oferta 2", "Req", "2026-05-01", "3 meses", 500.0)
-    emp_service.registrar_oferta(1, "Oferta 3", "Req", "2026-05-01", "3 meses", 350.0)
+    # Registrar ofertas y validarlas por coordinador
+    o1 = emp_service.registrar_oferta(1, "Oferta 1", "Req", "2026-05-01", "3 meses", 200.0)
+    o2 = emp_service.registrar_oferta(1, "Oferta 2", "Req", "2026-05-01", "3 meses", 500.0)
+    o3 = emp_service.registrar_oferta(1, "Oferta 3", "Req", "2026-05-01", "3 meses", 350.0)
+    o1.validada_por_coordinador = True
+    o2.validada_por_coordinador = True
+    o3.validada_por_coordinador = True
+    emp_service.oferta_service.repo.guardar(o1)
+    emp_service.oferta_service.repo.guardar(o2)
+    emp_service.oferta_service.repo.guardar(o3)
 
     catalogo = est_service.obtener_catalogo_ofertas(est.id_p)
     # Con experiencia ordena por remuneración ASC: 200 -> 350 -> 500
@@ -543,6 +555,9 @@ def test_empresa_visualizar_terna_recibida():
     p1 = post_service.registrar_postulacion(1, 10, 5, 1, "2026-05-29")
     p2 = post_service.registrar_postulacion(2, 10, 5, 1, "2026-05-29")
     p3 = post_service.registrar_postulacion(3, 10, 5, 1, "2026-05-29")
+    post_service.cambiar_estado(p1.id_pos, EstadoPostulacion.VALIDADA)
+    post_service.cambiar_estado(p2.id_pos, EstadoPostulacion.VALIDADA)
+    post_service.cambiar_estado(p3.id_pos, EstadoPostulacion.VALIDADA)
     post_service.agrupar_y_despachar_terna([p1.id_pos, p2.id_pos, p3.id_pos])
 
     terna = emp_service.visualizar_terna_recibida(1)
